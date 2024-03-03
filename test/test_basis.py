@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,33 +15,32 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-import numpy as np
-import matplotlib.pyplot as plt
 import os.path as osp
 
-import openmodes
-from openmodes.basis import DivRwgBasis, LoopStarBasis
-from openmodes.integration import DunavantRule
-from openmodes import Simulation
-from openmodes.visualise import write_vtk
-
+import matplotlib.pyplot as plt
+import numpy as np
 from helpers import read_2d_real, write_2d_real
-
 from numpy.testing import assert_allclose
 
+import openmodes
+from openmodes import Simulation
+from openmodes.basis import DivRwgBasis, LoopStarBasis
+from openmodes.integration import DunavantRule
+from openmodes.visualise import write_vtk
+
 tests_location = osp.split(__file__)[0]
-mesh_dir = osp.join(tests_location, 'input', 'test_basis')
-reference_dir = osp.join(tests_location, 'reference', 'test_basis')
+mesh_dir = osp.join(tests_location, "input", "test_basis")
+reference_dir = osp.join(tests_location, "reference", "test_basis")
 
 
 def test_interpolate_rwg(plot=False, write_reference=False, skip_asserts=False):
     "Interpolate an RWG basis function over a triangle"
 
     sim = Simulation()
-    srr = sim.load_mesh(osp.join(mesh_dir, 'SRR.msh'))
+    srr = sim.load_mesh(osp.join(mesh_dir, "SRR.msh"))
 
     basis = DivRwgBasis(srr)
 
@@ -54,13 +53,11 @@ def test_interpolate_rwg(plot=False, write_reference=False, skip_asserts=False):
 
     if write_reference:
         # save reference data
-        write_2d_real(osp.join(reference_dir, 'rwg_r.txt'), r)
-        write_2d_real(osp.join(reference_dir, 'rwg_basis_func.txt'),
-                      basis_func)
+        write_2d_real(osp.join(reference_dir, "rwg_r.txt"), r)
+        write_2d_real(osp.join(reference_dir, "rwg_basis_func.txt"), basis_func)
 
-    r_ref = read_2d_real(osp.join(reference_dir, 'rwg_r.txt'))
-    basis_func_ref = read_2d_real(osp.join(reference_dir,
-                                           'rwg_basis_func.txt'))
+    r_ref = read_2d_real(osp.join(reference_dir, "rwg_r.txt"))
+    basis_func_ref = read_2d_real(osp.join(reference_dir, "rwg_basis_func.txt"))
 
     if not skip_asserts:
         assert_allclose(r, r_ref, rtol=1e-6)
@@ -68,18 +65,17 @@ def test_interpolate_rwg(plot=False, write_reference=False, skip_asserts=False):
 
     if plot:
         plt.figure(figsize=(6, 6))
-        plt.quiver(r[:, 0], r[:, 1], basis_func[:, 0], basis_func[:, 1],
-                   scale=5e4)
+        plt.quiver(r[:, 0], r[:, 1], basis_func[:, 0], basis_func[:, 1], scale=5e4)
         plt.show()
 
 
-def test_interpolate_loop_star(plot=False, write_reference=False,
-                               skip_asserts=False):
+def test_interpolate_loop_star(plot=False, write_reference=False, skip_asserts=False):
     "Interpolate loop and star basis functions"
 
     sim = Simulation()
-    mesh = sim.load_mesh(osp.join(tests_location, 'input', 'test_basis',
-                                  'rectangle.msh'))
+    mesh = sim.load_mesh(
+        osp.join(tests_location, "input", "test_basis", "rectangle.msh")
+    )
 
     basis = LoopStarBasis(mesh)
 
@@ -96,20 +92,16 @@ def test_interpolate_loop_star(plot=False, write_reference=False,
 
     the_basis = basis[star_basis]
 
-    plus_nodes = mesh.nodes[basis.mesh.polygons[the_basis.tri_p,
-                                                the_basis.node_p]]
-    minus_nodes = mesh.nodes[basis.mesh.polygons[the_basis.tri_m,
-                                                 the_basis.node_m]]
+    plus_nodes = mesh.nodes[basis.mesh.polygons[the_basis.tri_p, the_basis.node_p]]
+    minus_nodes = mesh.nodes[basis.mesh.polygons[the_basis.tri_m, the_basis.node_m]]
 
     if write_reference:
         # save reference data
-        write_2d_real(osp.join(reference_dir, 'loop_star_r.txt'), r)
-        write_2d_real(osp.join(reference_dir, 'loop_star_basis_func.txt'),
-                      basis_func)
+        write_2d_real(osp.join(reference_dir, "loop_star_r.txt"), r)
+        write_2d_real(osp.join(reference_dir, "loop_star_basis_func.txt"), basis_func)
 
-    r_ref = read_2d_real(osp.join(reference_dir, 'loop_star_r.txt'))
-    basis_func_ref = read_2d_real(osp.join(reference_dir,
-                                           'loop_star_basis_func.txt'))
+    r_ref = read_2d_real(osp.join(reference_dir, "loop_star_r.txt"))
+    basis_func_ref = read_2d_real(osp.join(reference_dir, "loop_star_basis_func.txt"))
 
     if not skip_asserts:
         assert_allclose(r, r_ref, rtol=1e-6)
@@ -117,13 +109,12 @@ def test_interpolate_loop_star(plot=False, write_reference=False,
 
     if plot:
         plt.figure(figsize=(6, 6))
-        plt.quiver(r[:, 0], r[:, 1], basis_func[:, 0], basis_func[:, 1],
-                   pivot='middle')
-        plt.plot(plus_nodes[:, 0], plus_nodes[:, 1], 'x')
-        plt.plot(minus_nodes[:, 0], minus_nodes[:, 1], '+')
+        plt.quiver(r[:, 0], r[:, 1], basis_func[:, 0], basis_func[:, 1], pivot="middle")
+        plt.plot(plus_nodes[:, 0], plus_nodes[:, 1], "x")
+        plt.plot(minus_nodes[:, 0], minus_nodes[:, 1], "+")
         plt.show()
 
 
 if __name__ == "__main__":
-    test_interpolate_rwg(plot=True)#, skip_asserts=True)
-    test_interpolate_loop_star(plot=True) #, skip_asserts=True)
+    test_interpolate_rwg(plot=True)  # , skip_asserts=True)
+    test_interpolate_loop_star(plot=True)  # , skip_asserts=True)

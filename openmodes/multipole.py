@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Calculate multipole decompositions"""
 
 import numpy as np
@@ -38,7 +38,7 @@ def multipole_fixed(max_l, points):
     m = np.hstack((m_pos, np.arange(-max_l, 0)[None, :]))
 
     r = np.sqrt(np.sum(points**2, axis=1))
-    theta = np.arccos(points[:, 2]/r)
+    theta = np.arccos(points[:, 2] / r)
     phi = np.arctan2(points[:, 1], points[:, 0])
 
     st = np.sin(theta)
@@ -47,11 +47,11 @@ def multipole_fixed(max_l, points):
     cp = np.cos(phi)
 
     # calculate the unit vectors on the sphere
-    r_hat = points/r[:, None]
-    theta_hat = np.stack((ct*cp, ct*sp, -st), axis=-1)
+    r_hat = points / r[:, None]
+    theta_hat = np.stack((ct * cp, ct * sp, -st), axis=-1)
     phi_hat = np.stack((-sp, cp, np.zeros_like(sp)), axis=-1)
 
-    exp_imp = np.exp(-1j*m[None, :, :]*phi[:, None, None])
+    exp_imp = np.exp(-1j * m[None, :, :] * phi[:, None, None])
 
     P_lm = np.zeros((len(ct), len(l), m.shape[1]))
     dP_lm = np.zeros_like(P_lm)
@@ -66,24 +66,24 @@ def multipole_fixed(max_l, points):
         # Comes from http://dlmf.nist.gov/14.9, eq 14.9.13
         # Calculate negative values of m from positive
         # Does some relation apply to derivatives??
-        P_neg = (-1)**m_pos*factorial(l-m_pos)/factorial(l+m_pos)
-        P_lmn = P_neg*P_lmp
-        dP_lmn = P_neg*dP_lmp
+        P_neg = (-1) ** m_pos * factorial(l - m_pos) / factorial(l + m_pos)
+        P_lmn = P_neg * P_lmp
+        dP_lmn = P_neg * dP_lmp
 
         # combine positive and negative P_lmn
-        P_lm[point_count] = np.hstack((P_lmp,  P_lmn[:, :0:-1]))
+        P_lm[point_count] = np.hstack((P_lmp, P_lmn[:, :0:-1]))
         dP_lm[point_count] = np.hstack((dP_lmp, dP_lmn[:, :0:-1]))
 
     # theta derivative of P_lm(cos\theta)
-    tau_lm = -st[:, None, None]*dP_lm
-    pi_lm = P_lm*m/st[:, None, None]
+    tau_lm = -st[:, None, None] * dP_lm
+    pi_lm = P_lm * m / st[:, None, None]
 
-    return (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp,
-            tau_lm, pi_lm)
+    return (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp, tau_lm, pi_lm)
 
 
-def spherical_multipoles(max_l, k, points, current, current_M, eta=eta_0,
-                         fixed_terms=None):
+def spherical_multipoles(
+    max_l, k, points, current, current_M, eta=eta_0, fixed_terms=None
+):
     """Calculate the multipole coefficients in a spherical basis
 
     Using the formulas from:
@@ -126,59 +126,77 @@ def spherical_multipoles(max_l, k, points, current, current_M, eta=eta_0,
 
     # Use precalculated fixed terms if provided
     try:
-        (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp, tau_lm,
-         pi_lm) = fixed_terms
+        (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp, tau_lm, pi_lm) = (
+            fixed_terms
+        )
     except:
-        (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp, tau_lm,
-         pi_lm) = multipole_fixed(max_l, points)
+        (r, theta, phi, r_hat, theta_hat, phi_hat, P_lm, exp_imp, tau_lm, pi_lm) = (
+            multipole_fixed(max_l, points)
+        )
 
     jl = np.empty((num_points, num_l, 1))
     djl = np.empty_like(jl)
 
     # spherical Bessel functions must be calculated per point
     for n in range(num_points):
-        jl[n, :, :] = scipy.special.spherical_jn(l, k*r[n])
+        jl[n, :, :] = scipy.special.spherical_jn(l, k * r[n])
         # Calculate derivative explicitly using the same formula as scipy
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.spherical_jn.html
         djl[n, 0, 0] = -jl[n, 1, 0]
-        djl[n, 1:, 0] = jl[n, :-1, 0] - (l[1:, 0]+1)/(k*r[n])*jl[n, 1:, 0]
-        
+        djl[n, 1:, 0] = jl[n, :-1, 0] - (l[1:, 0] + 1) / (k * r[n]) * jl[n, 1:, 0]
 
     ll = l[None, 1:]
     # Riccati Bessel function plus its second derivative
     ric_plus_second = np.zeros((num_points, num_l, 1))
-    ric_plus_second[:, 1:] = ll*(ll+1)*jl[:, 1:]/(k*r[:, None, None])
+    ric_plus_second[:, 1:] = ll * (ll + 1) * jl[:, 1:] / (k * r[:, None, None])
 
     # First derivative, divided by kr
     ric_der = np.zeros_like(ric_plus_second)
-    ric_der[:, 1:] = jl[:, 1:]/(k*r[:, None, None]) + djl[:, 1:]
+    ric_der[:, 1:] = jl[:, 1:] / (k * r[:, None, None]) + djl[:, 1:]
 
     # components of current
-    J_r = np.sum(r_hat*current, axis=1)[:, None, None]
-    J_theta = np.sum(theta_hat*current, axis=1)[:, None, None]
-    J_phi = np.sum(phi_hat*current, axis=1)[:, None, None]
-    M_r = np.sum(r_hat*current_M, axis=1)[:, None, None]
-    M_theta = np.sum(theta_hat*current_M, axis=1)[:, None, None]
-    M_phi = np.sum(phi_hat*current_M, axis=1)[:, None, None]
+    J_r = np.sum(r_hat * current, axis=1)[:, None, None]
+    J_theta = np.sum(theta_hat * current, axis=1)[:, None, None]
+    J_phi = np.sum(phi_hat * current, axis=1)[:, None, None]
+    M_r = np.sum(r_hat * current_M, axis=1)[:, None, None]
+    M_theta = np.sum(theta_hat * current_M, axis=1)[:, None, None]
+    M_phi = np.sum(phi_hat * current_M, axis=1)[:, None, None]
 
     # indices l, m.
     # Note that for m, negative indices are used for negative m,
     # and values with |m| > l should be ignored
-    a_e = np.sum(exp_imp*(ric_plus_second*P_lm*J_r +
-                 ric_der*(tau_lm*J_theta - 1j*pi_lm*J_phi) +
-                 jl*(1j*pi_lm*M_theta + tau_lm*M_phi)), axis=0)
-    a_m = np.sum(exp_imp*(jl*(1j*pi_lm*J_theta + tau_lm*J_phi) +
-                 ric_plus_second*P_lm*M_r +
-                 ric_der*(tau_lm*M_theta - 1j*pi_lm*M_phi)), axis=0)
+    a_e = np.sum(
+        exp_imp
+        * (
+            ric_plus_second * P_lm * J_r
+            + ric_der * (tau_lm * J_theta - 1j * pi_lm * J_phi)
+            + jl * (1j * pi_lm * M_theta + tau_lm * M_phi)
+        ),
+        axis=0,
+    )
+    a_m = np.sum(
+        exp_imp
+        * (
+            jl * (1j * pi_lm * J_theta + tau_lm * J_phi)
+            + ric_plus_second * P_lm * M_r
+            + ric_der * (tau_lm * M_theta - 1j * pi_lm * M_phi)
+        ),
+        axis=0,
+    )
 
     # Ignore divide by zero and resulting NaN, which will occur for invalid
     # combinations of l, m
-    with np.errstate(invalid='ignore', divide='ignore'):
-        common_factor = (np.sqrt(eta)*k**2/(2*np.pi) *
-                         np.sqrt(factorial(l-m)/factorial(l+m)) /
-                         np.sqrt(l*(l+1))*np.sqrt(2*l+1))
-        a_e *= (1j)**(l-1)*common_factor
-        a_m *= (1j)**(l-1)*common_factor
+    with np.errstate(invalid="ignore", divide="ignore"):
+        common_factor = (
+            np.sqrt(eta)
+            * k**2
+            / (2 * np.pi)
+            * np.sqrt(factorial(l - m) / factorial(l + m))
+            / np.sqrt(l * (l + 1))
+            * np.sqrt(2 * l + 1)
+        )
+        a_e *= (1j) ** (l - 1) * common_factor
+        a_m *= (1j) ** (l - 1) * common_factor
 
     return a_e, a_m
 
@@ -215,7 +233,7 @@ def far_fields(a_e, a_m, theta, phi, k):
     ct = np.cos(theta)
     sp = np.sin(phi)
     cp = np.cos(phi)
-    r_hat = np.stack((st*cp, st*sp, ct), axis=-1)
+    r_hat = np.stack((st * cp, st * sp, ct), axis=-1)
 
     l = np.arange(num_l)[:, None]
     m_pos = np.arange(num_l)[None, :]
@@ -225,34 +243,49 @@ def far_fields(a_e, a_m, theta, phi, k):
     P_lm, dP_lm = scipy.special.lpmn(max_l, max_l, ct)
     P_lm = P_lm.T
 
-    Y_lm_pos = np.sqrt((2*l+1)/(4*np.pi)*factorial(l-m_pos)/factorial(l+m_pos))*P_lm*np.exp(1j*m_pos*phi)
-    Y_lm_neg = (-1)**m_pos*Y_lm_pos.conj()
-    Y_lm = np.hstack((Y_lm_pos,  Y_lm_neg[:, :0:-1]))
+    Y_lm_pos = (
+        np.sqrt((2 * l + 1) / (4 * np.pi) * factorial(l - m_pos) / factorial(l + m_pos))
+        * P_lm
+        * np.exp(1j * m_pos * phi)
+    )
+    Y_lm_neg = (-1) ** m_pos * Y_lm_pos.conj()
+    Y_lm = np.hstack((Y_lm_pos, Y_lm_neg[:, :0:-1]))
 
     # Angular momentum operator L acting on Y_lm
     # Note that for m=l and m=-l, roll operator gives a spurious result, but
     # this is cancelled by (m-l) and (m+l) terms respectively.
     # As the calculations include invalid combinations of l and m,
     # warnings should be suppressed for these calculations.
-    with np.errstate(invalid='ignore'):
-        Lp_Y_lm = np.sqrt((l-m)*(l+m+1))*np.roll(Y_lm, -1, axis=1)
-        Lm_Y_lm = np.sqrt((l+m)*(l-m+1))*np.roll(Y_lm, 1, axis=1)
-        X = np.stack((0.5*(Lp_Y_lm+Lm_Y_lm), -0.5j*(Lp_Y_lm-Lm_Y_lm), m*Y_lm),
-                     axis=-1) / np.sqrt(l*(l+1))[:, :, None]
+    with np.errstate(invalid="ignore"):
+        Lp_Y_lm = np.sqrt((l - m) * (l + m + 1)) * np.roll(Y_lm, -1, axis=1)
+        Lm_Y_lm = np.sqrt((l + m) * (l - m + 1)) * np.roll(Y_lm, 1, axis=1)
+        X = (
+            np.stack(
+                (0.5 * (Lp_Y_lm + Lm_Y_lm), -0.5j * (Lp_Y_lm - Lm_Y_lm), m * Y_lm),
+                axis=-1,
+            )
+            / np.sqrt(l * (l + 1))[:, :, None]
+        )
 
     H = np.zeros(3, np.complex128)
 
     # redefining l to be integer instead of range
     for l in range(1, num_l):
-        for m in range(-l, l+1):
-            H += (-1j)**(l+1)*(a_e[l, m]*X[l, m] + a_m[l, m]*np.cross(r_hat, X[l, m]))/k*np.sqrt(np.pi)
+        for m in range(-l, l + 1):
+            H += (
+                (-1j) ** (l + 1)
+                * (a_e[l, m] * X[l, m] + a_m[l, m] * np.cross(r_hat, X[l, m]))
+                / k
+                * np.sqrt(np.pi)
+            )
 
-    E = eta_0*np.cross(H, r_hat)
+    E = eta_0 * np.cross(H, r_hat)
     return E, H
 
 
-def cartesian_multipoles(points, charge, current, s, electric_order=1,
-                         magnetic_order=1):
+def cartesian_multipoles(
+    points, charge, current, s, electric_order=1, magnetic_order=1
+):
     """Calculate the electric and magnetic multipole moments up to the
     specified order
 
@@ -291,22 +324,24 @@ def cartesian_multipoles(points, charge, current, s, electric_order=1,
 
     # electric dipole moment
     if electric_order >= 1:
-        electric_moments.append(np.sum(points[:, :]*charge[:, None], axis=0)/s)
+        electric_moments.append(np.sum(points[:, :] * charge[:, None], axis=0) / s)
 
     # electric quadrupole moment
     if electric_order >= 2:
         quad = np.empty((3, 3), np.complex128)
         for i in range(3):
             for j in range(3):
-                quad[i, j] = np.sum(points[:, i]*points[:, j]*charge[:])
-        electric_moments.append(quad/s)
+                quad[i, j] = np.sum(points[:, i] * points[:, j] * charge[:])
+        electric_moments.append(quad / s)
 
     if electric_order >= 3:
         raise NotImplementedError("Electric moments only up to quadrupole")
 
     # magnetic dipole moment
     if magnetic_order >= 1:
-        magnetic_moments.append(0.5*np.sum(np.cross(points[:, :], current[:, :]), axis=0))
+        magnetic_moments.append(
+            0.5 * np.sum(np.cross(points[:, :], current[:, :]), axis=0)
+        )
 
     if magnetic_order >= 2:
         raise NotImplementedError("Magnetic moments only up to dipole")

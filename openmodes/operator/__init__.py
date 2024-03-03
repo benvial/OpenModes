@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,9 +15,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Operator classes
 """
 
-from .pec import EfieOperator, MfieOperator, CfieOperator
+from .pec import CfieOperator, EfieOperator, MfieOperator

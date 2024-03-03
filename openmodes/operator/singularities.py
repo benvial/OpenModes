@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,21 +15,24 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """Routines for dealing with singular integrals, where for convenience the
 quantities for both EFIE and MFIE may be calculated simultaneously"""
 
-import logging
-import numpy as np
 import hashlib
-from openmodes.core import face_integrals_yla_oijala
+import logging
+
+import numpy as np
+
 from openmodes.basis import LinearTriangleBasis
+from openmodes.core import face_integrals_yla_oijala
 
 
 class MultiSparse(object):
     """A sparse matrix class for holding multiple arrays with the same
     sparsity pattern."""
+
     def __init__(self, subarrays):
         """
         Parameters
@@ -67,7 +70,7 @@ class MultiSparse(object):
             for col, item in row_dict.items():
                 yield ((row, col), item)
 
-    def to_csr(self, order='C'):
+    def to_csr(self, order="C"):
         """Convert the matrix to compressed sparse row format, with
         common index arrays
 
@@ -93,16 +96,16 @@ class MultiSparse(object):
 
         data_arrays = []
 
-        for (dtype, shape) in self.subarrays:
+        for dtype, shape in self.subarrays:
             if shape is None:
-                data_arrays.append(np.empty(shape=num_objs, dtype=dtype,
-                                   order=order))
+                data_arrays.append(np.empty(shape=num_objs, dtype=dtype, order=order))
             else:
-                data_arrays.append(np.empty(shape=(num_objs,)+shape,
-                                   dtype=dtype, order=order))
+                data_arrays.append(
+                    np.empty(shape=(num_objs,) + shape, dtype=dtype, order=order)
+                )
 
         data_index = 0
-        num_rows = max(self.rows.keys())+1
+        num_rows = max(self.rows.keys()) + 1
 
         for row in range(num_rows):
             if row in self.rows:
@@ -118,13 +121,14 @@ class MultiSparse(object):
             indptr.append(data_index)
 
         # now put all subarrays and indices into a single dictionary
-        return (data_arrays+[indices,
-                             np.array(indptr, dtype=np.int32, order=order)])
+        return data_arrays + [indices, np.array(indptr, dtype=np.int32, order=order)]
+
 
 cached_singular_terms = {}
 
 
 from openmodes.integration import DunavantRule
+
 rule = DunavantRule(20)
 
 
@@ -168,14 +172,18 @@ def singular_impedance_rwg(basis, num_terms, rel_tol, normals):
     nodes = np.ascontiguousarray(basis.mesh.nodes, dtype=np.float64)
     num_faces = len(polygons)
 
-    singular_terms = {"T_EFIE": MultiSparse([(np.float64, (num_terms,)),  # phi
-                                             (np.float64, (num_terms, 3, 3))]),  # A
-                      "T_MFIE": MultiSparse([(np.float64, (num_terms, 3, 3))]),  # A
-                      "N_MFIE": MultiSparse([(np.float64, (num_terms, 3, 3))]),  # A
-                      }
+    singular_terms = {
+        "T_EFIE": MultiSparse(
+            [(np.float64, (num_terms,)), (np.float64, (num_terms, 3, 3))]  # phi
+        ),  # A
+        "T_MFIE": MultiSparse([(np.float64, (num_terms, 3, 3))]),  # A
+        "N_MFIE": MultiSparse([(np.float64, (num_terms, 3, 3))]),  # A
+    }
 
-    logging.info("Integrating singular terms for basis function %s, with %d "
-                 "terms, relative tolerance %e" % (basis, num_terms, rel_tol))
+    logging.info(
+        "Integrating singular terms for basis function %s, with %d "
+        "terms, relative tolerance %e" % (basis, num_terms, rel_tol)
+    )
 
     # find the neighbouring triangles (including self terms) to integrate
     # singular part
@@ -187,8 +195,13 @@ def singular_impedance_rwg(basis, num_terms, rel_tol, normals):
         for q in sharing_triangles:  # source
             # at least one node is shared between p and q
             normal = normals[p]
-            res = face_integrals_yla_oijala(nodes[polygons[q]], rule.points, rule.weights,
-                                            nodes[polygons[p]], normal_o=normal)
+            res = face_integrals_yla_oijala(
+                nodes[polygons[q]],
+                rule.points,
+                rule.weights,
+                nodes[polygons[p]],
+                normal_o=normal,
+            )
             if q != p:
                 # The self triangle terms are not evaluated for MFIE
                 singular_terms["T_MFIE"][p, q] = (res[3],)
@@ -197,6 +210,7 @@ def singular_impedance_rwg(basis, num_terms, rel_tol, normals):
 
     # Arrays are currently put into fortran order, under the assumption
     # that they will mostly be used by fortran routines.
-    cached_singular_terms[unique_id] = {k: v.to_csr(order='F')
-                                        for k, v in singular_terms.items()}
+    cached_singular_terms[unique_id] = {
+        k: v.to_csr(order="F") for k, v in singular_terms.items()
+    }
     return cached_singular_terms[unique_id]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """
 Routines for using `gmsh` to mesh a geometry, and load the resulting mesh into
@@ -26,15 +26,16 @@ Gmsh 2.8.4 is required, as it introduced the `setnumber` command line parameter
 
 from __future__ import print_function
 
-import subprocess
-import os.path as osp
-import os
-import struct
-import numpy as np
-from collections import defaultdict
-import re
 import logging
+import os
+import os.path as osp
+import re
+import struct
+import subprocess
 import tempfile
+from collections import defaultdict
+
+import numpy as np
 
 from openmodes.helpers import MeshError
 
@@ -42,13 +43,12 @@ from openmodes.helpers import MeshError
 MIN_VERSION = (3, 0, 0)
 
 try:
-    gmsh_path = os.environ['GMSH_PATH']
+    gmsh_path = os.environ["GMSH_PATH"]
 except KeyError:
-    gmsh_path = 'gmsh'
+    gmsh_path = "gmsh"
 
 
-def mesh_geometry(filename, dirname, mesh_tol=None, binary=True,
-                  parameters={}):
+def mesh_geometry(filename, dirname, mesh_tol=None, binary=True, parameters={}):
     """Call gmsh to surface mesh a geometry file with a specified maximum
     tolerance
 
@@ -82,25 +82,35 @@ def mesh_geometry(filename, dirname, mesh_tol=None, binary=True,
     if not osp.exists(filename):
         raise MeshError("Geometry file %s not found" % filename)
 
-    meshname = osp.join(dirname, osp.splitext(osp.basename(filename))[0]
-                        + ".msh")
+    meshname = osp.join(dirname, osp.splitext(osp.basename(filename))[0] + ".msh")
 
-    call_options = [gmsh_path, filename, '-2', '-o', meshname,
-                    '-string', 'Mesh.Algorithm=1;']
+    call_options = [
+        gmsh_path,
+        filename,
+        "-2",
+        "-o",
+        meshname,
+        "-string",
+        "Mesh.Algorithm=1;",
+    ]
 
     # override geometric parameters on the command-line
     for param, value in parameters.items():
-        call_options += ['-setnumber', param, str(value)]
+        call_options += ["-setnumber", param, str(value)]
 
     if mesh_tol is not None:
-        call_options += ['-clmax', '%f' % mesh_tol]
+        call_options += ["-clmax", "%f" % mesh_tol]
 
     if binary:
-        call_options += ['-bin']
+        call_options += ["-bin"]
 
     logging.info("Calling gmsh with options %s" % call_options)
-    proc = subprocess.Popen(call_options, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE, universal_newlines=True)
+    proc = subprocess.Popen(
+        call_options,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
 
     # run the process and read in stderr and stdout streams
     stdouttxt, stderrtxt = proc.communicate()
@@ -112,8 +122,7 @@ def mesh_geometry(filename, dirname, mesh_tol=None, binary=True,
 
     logging.info(stdouttxt)
     if len(stderrtxt) > 0:
-        logging.warning("gmsh error/warning for file %s:\n%s"
-                        % (filename, stderrtxt))
+        logging.warning("gmsh error/warning for file %s:\n%s" % (filename, stderrtxt))
 
     return meshname
 
@@ -124,8 +133,11 @@ POINT_TYPE = 15
 # the number of nodes in different gmsh element types which may be encountered
 GMSH_ELEMENT_NODES = {EDGE_TYPE: 2, TRIANGLE_TYPE: 3, POINT_TYPE: 1}
 
-ELEMENT_NAME_MAPPING = {"edges": EDGE_TYPE, "triangles": TRIANGLE_TYPE,
-                        "points": POINT_TYPE}
+ELEMENT_NAME_MAPPING = {
+    "edges": EDGE_TYPE,
+    "triangles": TRIANGLE_TYPE,
+    "points": POINT_TYPE,
+}
 
 
 def read_nodes(file_handle):
@@ -134,8 +146,8 @@ def read_nodes(file_handle):
 
     nodes = np.empty((num_nodes, 3), np.float32)
     for node_count in range(num_nodes):
-        this_node = struct.unpack('=iddd', file_handle.read(28))
-        if this_node[0] != node_count+1:
+        this_node = struct.unpack("=iddd", file_handle.read(28))
+        if this_node[0] != node_count + 1:
             raise MeshError("Inconsistent node numbering")
 
         nodes[node_count] = this_node[1:]
@@ -148,11 +160,11 @@ def read_nodes(file_handle):
 def check_format(file_handle):
     "Check that the format of a gmsh file"
     # check the header version
-    if file_handle.readline().decode('ascii').split() != ['2.2', '1', '8']:
+    if file_handle.readline().decode("ascii").split() != ["2.2", "1", "8"]:
         raise MeshError("gmsh file has incorrect version format")
 
     # check the endianness of the file
-    if struct.unpack('=i', file_handle.read(4))[0] != 1:
+    if struct.unpack("=i", file_handle.read(4))[0] != 1:
         raise MeshError("gmsh file format invalid")
 
     file_handle.readline()
@@ -168,18 +180,19 @@ def read_elements(file_handle, wanted_element_types):
     # currently we are only interested in the triangle elements
     # so skip over all others
     for _ in range(num_elements):
-        element_type, num_elem_in_group, num_tags = struct.unpack('=iii',
-                                                      file_handle.read(12))
+        element_type, num_elem_in_group, num_tags = struct.unpack(
+            "=iii", file_handle.read(12)
+        )
 
         num_nodes_in_elem = GMSH_ELEMENT_NODES[element_type]
         if num_tags < 2:
             raise MeshError("Missing elementary geometry tag")
 
-        element_bytes = 4*(1 + num_tags + num_nodes_in_elem)
+        element_bytes = 4 * (1 + num_tags + num_nodes_in_elem)
 
-        elem_format = "=i" + "i"*num_tags + "i"*num_nodes_in_elem
+        elem_format = "=i" + "i" * num_tags + "i" * num_nodes_in_elem
 
-        element_data = file_handle.read(num_elem_in_group*element_bytes)
+        element_data = file_handle.read(num_elem_in_group * element_bytes)
 
         # Avoid reading in unwanted element types. This is important for
         # getting rid of nodes which are not a part of any triangle
@@ -188,17 +201,22 @@ def read_elements(file_handle, wanted_element_types):
 
         # iterate over all elements within the same header block
         for these_elements_count in range(num_elem_in_group):
-            this_element = struct.unpack(elem_format,
-                element_data[these_elements_count*element_bytes:
-                                (these_elements_count+1)*element_bytes])
+            this_element = struct.unpack(
+                elem_format,
+                element_data[
+                    these_elements_count
+                    * element_bytes : (these_elements_count + 1)
+                    * element_bytes
+                ],
+            )
 
             # Assumes that the required default tags are used, and finds the
             # *physical entity* of the mesh element
             entity = this_element[1]
-            #entity = this_element[2]
+            # entity = this_element[2]
 
             # NB: conversion to python 0-based indexing is done here
-            element_nodes = np.array(this_element[-num_nodes_in_elem:])-1
+            element_nodes = np.array(this_element[-num_nodes_in_elem:]) - 1
 
             object_elements[entity][element_type].append(element_nodes)
             object_nodes[entity].update(element_nodes)
@@ -217,7 +235,7 @@ def read_physical_names(file_handle):
     names_regex = re.compile(r'(\d*)\s(\d*)\s"([^"]*)"')
 
     for _ in range(num_physical_names):
-        names_match = names_regex.match(file_handle.readline().decode('ascii'))
+        names_match = names_regex.match(file_handle.readline().decode("ascii"))
         dimension, num, name = names_match.groups()
         physical_names[int(num)] = name
 
@@ -251,15 +269,14 @@ def read_mesh(filename, returned_elements=("edges", "triangles")):
 
     """
 
-    wanted_element_types = set(ELEMENT_NAME_MAPPING[n] for n in
-                               returned_elements)
+    wanted_element_types = set(ELEMENT_NAME_MAPPING[n] for n in returned_elements)
 
     physical_names = None  # may not exist in file
 
     with open(filename, "rb") as file_handle:
         header = "Nothing"
         while True:
-            header = file_handle.readline().decode('ascii').strip()
+            header = file_handle.readline().decode("ascii").strip()
             if header == "":
                 # should be at the end of the file
                 break
@@ -270,23 +287,25 @@ def read_mesh(filename, returned_elements=("edges", "triangles")):
                 if len(nodes) == 0:
                     raise MeshError("No nodes in mesh")
             elif header == "$Elements":
-                object_nodes, object_elements = read_elements(file_handle,
-                                                          wanted_element_types)
+                object_nodes, object_elements = read_elements(
+                    file_handle, wanted_element_types
+                )
             elif header == "$PhysicalNames":
                 physical_names = read_physical_names(file_handle)
             else:
                 raise MeshError("Unkown header type " + header)
 
-            end_header = "$End"+header[1:]
-            if file_handle.readline().decode('ascii').strip() != end_header:
+            end_header = "$End" + header[1:]
+            if file_handle.readline().decode("ascii").strip() != end_header:
                 raise MeshError("Header %s with no matching %s" % (header, end_header))
 
     return_vals = []
 
     # Go through each entity, and work out which nodes belong to it. Nodes are
     # renumbered, so elements are updated to reflect new numbering
-    for obj_nums, obj_nodes, obj_elements in zip(object_nodes.keys(),
-            object_nodes.values(), object_elements.values()):
+    for obj_nums, obj_nodes, obj_elements in zip(
+        object_nodes.keys(), object_nodes.values(), object_elements.values()
+    ):
 
         # renumber the nodes
         orig_nodes = np.sort(list(obj_nodes))
@@ -294,14 +313,13 @@ def read_mesh(filename, returned_elements=("edges", "triangles")):
         for node_count, node in enumerate(orig_nodes):
             new_nodes[node] = node_count
 
-        this_part = {'nodes': nodes[orig_nodes]}
+        this_part = {"nodes": nodes[orig_nodes]}
 
         # let the elements know about the renumbered nodes
         for elem_name in returned_elements:
             returned_type = ELEMENT_NAME_MAPPING[elem_name]
             if len(obj_elements[returned_type]) > 0:
-                this_part[elem_name] = new_nodes[
-                                        np.array(obj_elements[returned_type])]
+                this_part[elem_name] = new_nodes[np.array(obj_elements[returned_type])]
 
         # add the physical name if it exists
         try:
@@ -312,6 +330,7 @@ def read_mesh(filename, returned_elements=("edges", "triangles")):
         return_vals.append(this_part)
 
     return tuple(return_vals)
+
 
 def read_mesh_meshio(filename):
     """Read a gmsh binary mesh file using the meshio library
@@ -338,32 +357,39 @@ def read_mesh_meshio(filename):
 
     import meshio
 
-    mesh = meshio.read(filename, file_format='gmsh')
+    mesh = meshio.read(filename, file_format="gmsh")
 
     # check whether multiple physical objects are defined
-    if 'gmsh:physical' in mesh.cell_data:
-        triangle_physical = mesh.cell_data_dict['gmsh:physical']['triangle']
+    if "gmsh:physical" in mesh.cell_data:
+        triangle_physical = mesh.cell_data_dict["gmsh:physical"]["triangle"]
         if not np.all(triangle_physical == triangle_physical[0]):
-            raise NotImplementedError('Multiple physical objects in one mesh not yet implemented')
+            raise NotImplementedError(
+                "Multiple physical objects in one mesh not yet implemented"
+            )
 
     # eliminate points which are not part of the object
-    mesh.remove_orphaned_nodes() 
+    mesh.remove_orphaned_nodes()
 
-    return [{'nodes': mesh.points, 'triangles': mesh.cells_dict['triangle']}]
+    return [{"nodes": mesh.points, "triangles": mesh.cells_dict["triangle"]}]
 
 
 def check_installed():
     "Check if a supported version of gmsh is installed"
-    call_options = [gmsh_path, '--version']
+    call_options = [gmsh_path, "--version"]
 
     try:
         # Workaround for different versions of gmsh, 3.x writes to stderr,
         # 4.x writes to stdout, but only if redirected to a file
         with tempfile.TemporaryFile() as out:
-            proc = subprocess.run(call_options, stdout=out, stderr=out,
-                                    universal_newlines=True, encoding='utf-8')
+            proc = subprocess.run(
+                call_options,
+                stdout=out,
+                stderr=out,
+                universal_newlines=True,
+                encoding="utf-8",
+            )
             out.seek(0)
-            version_string = out.readline().decode('utf-8').strip()
+            version_string = out.readline().decode("utf-8").strip()
 
     except OSError:
         raise MeshError("gmsh not found")
@@ -371,5 +397,7 @@ def check_installed():
     ver = tuple([int(x) for x in version_string.split(".")])
 
     if ver < MIN_VERSION:
-        raise MeshError(("gmsh version %d.%d.%d found, " +
-            "but version %d.%d.%d required") % (ver+MIN_VERSION))
+        raise MeshError(
+            ("gmsh version %d.%d.%d found, " + "but version %d.%d.%d required")
+            % (ver + MIN_VERSION)
+        )

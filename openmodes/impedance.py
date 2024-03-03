@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 "Classes for holding impedance matrix objects"
 
 from __future__ import division
@@ -31,10 +31,19 @@ class ImpedanceMatrixLA(object):
     """An impedance matrix based on LookupArray, which can hold matrices for
     Parts of arbitrary level"""
 
-    matrix_names = ('Z',)
+    matrix_names = ("Z",)
 
-    def __init__(self, part_o, part_s, basis_container, sources, unknowns,
-                 metadata=None, matrices=None, derivatives=None):
+    def __init__(
+        self,
+        part_o,
+        part_s,
+        basis_container,
+        sources,
+        unknowns,
+        metadata=None,
+        matrices=None,
+        derivatives=None,
+    ):
         self.md = metadata or dict()
         self.part_o = part_o
         self.part_s = part_s
@@ -44,10 +53,13 @@ class ImpedanceMatrixLA(object):
 
         # Note that the internal LookupArray format is different from the
         # final format as it excludes the quantity lookup.
-        self.matrices = {name: LookupArray(((part_o, basis_container),
-                                            (part_s, basis_container)),
-                                           dtype=np.complex128)
-                         for name in self.matrix_names}
+        self.matrices = {
+            name: LookupArray(
+                ((part_o, basis_container), (part_s, basis_container)),
+                dtype=np.complex128,
+            )
+            for name in self.matrix_names
+        }
 
         if matrices is not None:
             # fill out any matrices which are supplied
@@ -56,23 +68,39 @@ class ImpedanceMatrixLA(object):
 
         # create the frequency derivatives of the matrices
         if derivatives is None:
-            self.der = {name: LookupArray(((part_o, basis_container,),
-                                           (part_s, basis_container)),
-                                          dtype=np.complex128)
-                        for name in self.matrix_names}
+            self.der = {
+                name: LookupArray(
+                    (
+                        (
+                            part_o,
+                            basis_container,
+                        ),
+                        (part_s, basis_container),
+                    ),
+                    dtype=np.complex128,
+                )
+                for name in self.matrix_names
+            }
         else:
             self.der = derivatives
 
     def val(self):
         "The value of the impedance matrix"
-        Z = LookupArray((self.sources, (self.part_o, self.basis_container), self.unknowns,
-                         (self.part_s, self.basis_container)), dtype=np.complex128)
-        Z.simple_view()[:] = self.matrices['Z']
+        Z = LookupArray(
+            (
+                self.sources,
+                (self.part_o, self.basis_container),
+                self.unknowns,
+                (self.part_s, self.basis_container),
+            ),
+            dtype=np.complex128,
+        )
+        Z.simple_view()[:] = self.matrices["Z"]
         return Z
 
     def frequency_derivative(self):
         # TODO: return LookupArray?
-        return self.der['Z']
+        return self.der["Z"]
 
     def clear_cached(self):
         "Clear any cached data"
@@ -100,7 +128,7 @@ class ImpedanceMatrixLA(object):
         lookup = (self.unknowns, (self.part_s, self.basis_container))
 
         if len(vec.shape) > 1:
-            lookup = lookup+(vec.shape[1],)
+            lookup = lookup + (vec.shape[1],)
 
         I = LookupArray(lookup, dtype=np.complex128)
         I_simp = I.simple_view()
@@ -121,9 +149,16 @@ class ImpedanceMatrixLA(object):
         else:
             der = {key: val[ind1, ind2] for key, val in self.der.items()}
 
-        return self.__class__(ind1, ind2, self.basis_container, self.sources,
-                              self.unknowns, metadata=self.md,
-                              matrices=matrices, derivatives=der)
+        return self.__class__(
+            ind1,
+            ind2,
+            self.basis_container,
+            self.sources,
+            self.unknowns,
+            metadata=self.md,
+            matrices=matrices,
+            derivatives=der,
+        )
 
     def __setitem__(self, index, other):
         "Set part of this matrix from another impedance matrix"
@@ -143,100 +178,148 @@ class ImpedanceMatrixLA(object):
         else:
             der = {key: val.T for key, val in self.der.items()}
 
-        return self.__class__(self.part_s, self.part_o, self.basis_container,
-                              self.sources, self.unknowns, metadata=self.md,
-                              matrices=matrices, derivatives=der)
+        return self.__class__(
+            self.part_s,
+            self.part_o,
+            self.basis_container,
+            self.sources,
+            self.unknowns,
+            metadata=self.md,
+            matrices=matrices,
+            derivatives=der,
+        )
 
     def weight(self, vr, vl):
         "Weight the impedance matrix by right and left vectors"
-        new_matrices = {name: np.dot(vl.simple_view(), np.dot(mat, vr.simple_view()))
-                        for name, mat in self.matrices.items()}
-        new_der = {name: np.dot(vl.simple_view(), np.dot(mat, vr.simple_view()))
-                   for name, mat in self.der.items()}
+        new_matrices = {
+            name: np.dot(vl.simple_view(), np.dot(mat, vr.simple_view()))
+            for name, mat in self.matrices.items()
+        }
+        new_der = {
+            name: np.dot(vl.simple_view(), np.dot(mat, vr.simple_view()))
+            for name, mat in self.der.items()
+        }
         macro_container = vr.lookup[3][1]
-        return self.__class__(self.part_o, self.part_s, macro_container,
-                              ('modes',), ('modes',), self.md, new_matrices,
-                              new_der)
+        return self.__class__(
+            self.part_o,
+            self.part_s,
+            macro_container,
+            ("modes",),
+            ("modes",),
+            self.md,
+            new_matrices,
+            new_der,
+        )
 
 
 class EfieImpedanceMatrixLA(ImpedanceMatrixLA):
     "An impedance matrix for metallic objects solved via EFIE"
 
-    matrix_names = ('L', 'S')
+    matrix_names = ("L", "S")
 
     def val(self):
         "The value of the impedance matrix"
-        s = self.md['s']
-        Z = LookupArray((self.sources, (self.part_o, self.basis_container),
-                         self.unknowns, (self.part_s, self.basis_container)),
-                        dtype=np.complex128)
-        Z.simple_view()[:] = self.matrices['S']/s + s*self.matrices['L']
+        s = self.md["s"]
+        Z = LookupArray(
+            (
+                self.sources,
+                (self.part_o, self.basis_container),
+                self.unknowns,
+                (self.part_s, self.basis_container),
+            ),
+            dtype=np.complex128,
+        )
+        Z.simple_view()[:] = self.matrices["S"] / s + s * self.matrices["L"]
         return Z
 
     def frequency_derivative(self):
         # TODO: return LookupArray
-        return (self.matrices['L'] +
-                self.md['s']*self.der['L'] -
-                self.matrices['S']/self.md['s']**2 +
-                self.der['S']/self.md['s'])
+        return (
+            self.matrices["L"]
+            + self.md["s"] * self.der["L"]
+            - self.matrices["S"] / self.md["s"] ** 2
+            + self.der["S"] / self.md["s"]
+        )
 
 
 class CfieImpedanceMatrixLA(ImpedanceMatrixLA):
     "An impedance matrix for metallic objects solved via EFIE"
 
-    matrix_names = ('L', 'S', 'M')
+    matrix_names = ("L", "S", "M")
 
     def val(self):
         "The value of the impedance matrix"
-        s = self.md['s']
-        alpha = self.md['alpha']
-        Z = LookupArray((self.sources, (self.part_o, self.basis_container),
-                         self.unknowns, (self.part_s, self.basis_container)),
-                        dtype=np.complex128)
-        Z.simple_view()[:] = (alpha*(self.matrices['S']/s + s*self.matrices['L']) +
-                              (1.0-alpha)*self.matrices['M'])
+        s = self.md["s"]
+        alpha = self.md["alpha"]
+        Z = LookupArray(
+            (
+                self.sources,
+                (self.part_o, self.basis_container),
+                self.unknowns,
+                (self.part_s, self.basis_container),
+            ),
+            dtype=np.complex128,
+        )
+        Z.simple_view()[:] = (
+            alpha * (self.matrices["S"] / s + s * self.matrices["L"])
+            + (1.0 - alpha) * self.matrices["M"]
+        )
         return Z
 
 
 class PenetrableImpedanceMatrixLA(ImpedanceMatrixLA):
     "An impedance matrix for penetrable objects"
 
-    matrix_names = ('L_i', 'L_o', 'S_i', 'S_o', 'K_i', 'K_o')
+    matrix_names = ("L_i", "L_o", "S_i", "S_o", "K_i", "K_o")
 
     # TODO: D_i and K_i are stored inefficiently as full matrices, but only
     # self terms are actually needed
 
     def val(self):
         "The value of the impedance matrix"
-        s = self.md['s']
-        D_i = s*self.matrices['L_i']+self.matrices['S_i']/s
-        D_o = s*self.matrices['L_o']+self.matrices['S_o']/s
-        K_i = self.matrices['K_i']
-        K_o = self.matrices['K_o']
-        eta_o = self.md['eta_o']
-        eta_i = self.md['eta_i']
-        w_EFIE_i = self.md['w_EFIE_i']
-        w_EFIE_o = self.md['w_EFIE_o']
-        w_MFIE_i = self.md['w_MFIE_i']
-        w_MFIE_o = self.md['w_MFIE_o']
+        s = self.md["s"]
+        D_i = s * self.matrices["L_i"] + self.matrices["S_i"] / s
+        D_o = s * self.matrices["L_o"] + self.matrices["S_o"] / s
+        K_i = self.matrices["K_i"]
+        K_o = self.matrices["K_o"]
+        eta_o = self.md["eta_o"]
+        eta_i = self.md["eta_i"]
+        w_EFIE_i = self.md["w_EFIE_i"]
+        w_EFIE_o = self.md["w_EFIE_o"]
+        w_MFIE_i = self.md["w_MFIE_i"]
+        w_MFIE_o = self.md["w_MFIE_o"]
 
-        Z = LookupArray((("E", "H"), (self.part_o, self.basis_container),
-                         ("J", "M"), (self.part_s, self.basis_container)),
-                        dtype=np.complex128)
+        Z = LookupArray(
+            (
+                ("E", "H"),
+                (self.part_o, self.basis_container),
+                ("J", "M"),
+                (self.part_s, self.basis_container),
+            ),
+            dtype=np.complex128,
+        )
 
         # first calculate the external problem contributions
-        Z["E", :, "J"] = eta_o*D_o*w_EFIE_o
-        Z["E", :, "M"] = -K_o*w_EFIE_o
-        Z["H", :, "J"] = K_o*w_MFIE_o
-        Z["H", :, "M"] = D_o/eta_o*w_MFIE_o
+        Z["E", :, "J"] = eta_o * D_o * w_EFIE_o
+        Z["E", :, "M"] = -K_o * w_EFIE_o
+        Z["H", :, "J"] = K_o * w_MFIE_o
+        Z["H", :, "M"] = D_o / eta_o * w_MFIE_o
 
         # The internal contributions are only for self-terms
         for part_o in self.part_o.iter_single():
             for part_s in self.part_s.iter_single():
                 if part_o == part_s:
-                    Z["E", :, "J"][part_o, part_s] += eta_i[part_s]*D_i[part_o, part_s]*w_EFIE_i[part_s]
-                    Z["E", :, "M"][part_o, part_s] -= K_i[part_o, part_s]*w_EFIE_i[part_s]
-                    Z["H", :, "J"][part_o, part_s] += K_i[part_o, part_s]*w_MFIE_i[part_s]
-                    Z["H", :, "M"][part_o, part_s] += D_i[part_o, part_s]/eta_i[part_s]*w_MFIE_i[part_s]
+                    Z["E", :, "J"][part_o, part_s] += (
+                        eta_i[part_s] * D_i[part_o, part_s] * w_EFIE_i[part_s]
+                    )
+                    Z["E", :, "M"][part_o, part_s] -= (
+                        K_i[part_o, part_s] * w_EFIE_i[part_s]
+                    )
+                    Z["H", :, "J"][part_o, part_s] += (
+                        K_i[part_o, part_s] * w_MFIE_i[part_s]
+                    )
+                    Z["H", :, "M"][part_o, part_s] += (
+                        D_i[part_o, part_s] / eta_i[part_s] * w_MFIE_i[part_s]
+                    )
 
         return Z

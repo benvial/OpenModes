@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Operators for surface equivalent problems for penetrable scatteres"""
 
 from __future__ import division
@@ -23,10 +23,10 @@ from __future__ import division
 import numpy as np
 
 from openmodes.basis import LinearTriangleBasis
+from openmodes.constants import c, epsilon_0, eta_0, mu_0
 from openmodes.impedance import PenetrableImpedanceMatrixLA
-from openmodes.operator.operator import Operator
 from openmodes.operator import rwg
-from openmodes.constants import epsilon_0, mu_0, c, eta_0
+from openmodes.operator.operator import Operator
 
 
 class TOperator(Operator):
@@ -35,12 +35,18 @@ class TOperator(Operator):
     Note that this class is designed as an abstract base, so it should not
     be created directly.
     """
+
     reciprocal = False
 
-    def __init__(self, integration_rule, basis_container,
-                 background_material, num_singular_terms=2,
-                 singularity_accuracy=1e-5,
-                 impedance_class=None):
+    def __init__(
+        self,
+        integration_rule,
+        basis_container,
+        background_material,
+        num_singular_terms=2,
+        singularity_accuracy=1e-5,
+        impedance_class=None,
+    ):
         """
         Parameters
         ----------
@@ -70,15 +76,17 @@ class TOperator(Operator):
 
         metadata = metadata or dict()
 
-        metadata['eta_o'] = self.background_material.eta_r(s)
-        metadata['eta_i'] = {}
-        metadata['w_EFIE_o'], metadata['w_MFIE_o'] = self.weights_o(s)
-        metadata['w_EFIE_i'] = {}
-        metadata['w_MFIE_i'] = {}
+        metadata["eta_o"] = self.background_material.eta_r(s)
+        metadata["eta_i"] = {}
+        metadata["w_EFIE_o"], metadata["w_MFIE_o"] = self.weights_o(s)
+        metadata["w_EFIE_i"] = {}
+        metadata["w_MFIE_i"] = {}
 
         for part in parent_s.iter_single():
-            metadata['eta_i'][part] = part.material.eta_r(s)
-            metadata['w_EFIE_i'][part], metadata['w_MFIE_i'][part] = self.weights_i(s, part)
+            metadata["eta_i"][part] = part.material.eta_r(s)
+            metadata["w_EFIE_i"][part], metadata["w_MFIE_i"][part] = self.weights_i(
+                s, part
+            )
 
         return super(TOperator, self).impedance(s, parent_o, parent_s, metadata)
 
@@ -115,51 +123,87 @@ class TOperator(Operator):
         eps_o = self.background_material.epsilon_r(s)
         mu_i = part_s.material.mu_r(s)
         mu_o = self.background_material.mu_r(s)
-        c_i = c/np.sqrt(eps_i*mu_i)
-        c_o = c/np.sqrt(eps_o*mu_o)
+        c_i = c / np.sqrt(eps_i * mu_i)
+        c_o = c / np.sqrt(eps_o * mu_o)
 
         is_self_term = part_o == part_s
 
-        matrix_names = ('L_o', 'S_o', 'K_o')
+        matrix_names = ("L_o", "S_o", "K_o")
         if isinstance(basis_o, LinearTriangleBasis):
             if is_self_term:
-                res = rwg.impedance_G(s, self.integration_rule, basis_o,
-                                      part_o.nodes, basis_s, part_s.nodes,
-                                      -normals, is_self_term, eps_i, mu_i,
-                                      self.num_singular_terms,
-                                      self.singularity_accuracy)
-                L_i = res[0]/c_i*eta_0
-                S_i = res[1]*c_i*eta_0
+                res = rwg.impedance_G(
+                    s,
+                    self.integration_rule,
+                    basis_o,
+                    part_o.nodes,
+                    basis_s,
+                    part_s.nodes,
+                    -normals,
+                    is_self_term,
+                    eps_i,
+                    mu_i,
+                    self.num_singular_terms,
+                    self.singularity_accuracy,
+                )
+                L_i = res[0] / c_i * eta_0
+                S_i = res[1] * c_i * eta_0
 
                 # note opposite sign of normals for interior problem
-                res = rwg.impedance_curl_G(s, self.integration_rule, basis_o,
-                                           part_o.nodes, basis_s, part_s.nodes,
-                                           -normals, is_self_term, eps_i, mu_i,
-                                           self.num_singular_terms,
-                                           self.singularity_accuracy,
-                                           tangential_form=True)
-                K_i = res[0]*eta_0
+                res = rwg.impedance_curl_G(
+                    s,
+                    self.integration_rule,
+                    basis_o,
+                    part_o.nodes,
+                    basis_s,
+                    part_s.nodes,
+                    -normals,
+                    is_self_term,
+                    eps_i,
+                    mu_i,
+                    self.num_singular_terms,
+                    self.singularity_accuracy,
+                    tangential_form=True,
+                )
+                K_i = res[0] * eta_0
 
-                matrix_names += ('L_i', 'S_i', 'K_i')
+                matrix_names += ("L_i", "S_i", "K_i")
 
-            res = rwg.impedance_G(s, self.integration_rule, basis_o,
-                                  part_o.nodes, basis_s, part_s.nodes,
-                                  normals, is_self_term, eps_o, mu_o,
-                                  self.num_singular_terms,
-                                  self.singularity_accuracy)
+            res = rwg.impedance_G(
+                s,
+                self.integration_rule,
+                basis_o,
+                part_o.nodes,
+                basis_s,
+                part_s.nodes,
+                normals,
+                is_self_term,
+                eps_o,
+                mu_o,
+                self.num_singular_terms,
+                self.singularity_accuracy,
+            )
 
             # This scaling ensures that this operator has the same definition
             # as cursive D defined by Yla-Oijala, Radio Science 2005.
-            L_o = res[0]/c_o*eta_0
-            S_o = res[1]*c_o*eta_0
+            L_o = res[0] / c_o * eta_0
+            S_o = res[1] * c_o * eta_0
 
-            res = rwg.impedance_curl_G(s, self.integration_rule, basis_o,
-                                       part_o.nodes, basis_s, part_s.nodes,
-                                       normals, is_self_term, eps_o, mu_o,
-                                       self.num_singular_terms,
-                                       self.singularity_accuracy,
-                                       tangential_form=True)
-            K_o = res[0]*eta_0
+            res = rwg.impedance_curl_G(
+                s,
+                self.integration_rule,
+                basis_o,
+                part_o.nodes,
+                basis_s,
+                part_s.nodes,
+                normals,
+                is_self_term,
+                eps_o,
+                mu_o,
+                self.num_singular_terms,
+                self.singularity_accuracy,
+                tangential_form=True,
+            )
+            K_o = res[0] * eta_0
         else:
             raise NotImplementedError
 
@@ -171,14 +215,15 @@ class TOperator(Operator):
             Z.matrices[name][part_o, part_s] = loc[name]
 
     def source_vector(self, source_field, s, parent, extinction_field=False):
-        V = super(TOperator, self).source_vector(source_field, s, parent,
-                                                 extinction_field)
+        V = super(TOperator, self).source_vector(
+            source_field, s, parent, extinction_field
+        )
         if extinction_field:
             V["H"] *= eta_0
         else:
             w_EFIE_o, w_MFIE_o = self.weights_o(s)
             V["E"] *= w_EFIE_o
-            V["H"] *= eta_0*w_MFIE_o
+            V["H"] *= eta_0 * w_MFIE_o
         return V
 
 
@@ -186,15 +231,23 @@ class PMCHWTOperator(TOperator):
     "Tangential PMCHWT operator for penetrable objects"
     reciprocal = False
 
-    def __init__(self, integration_rule, basis_container,
-                 background_material,
-                 num_singular_terms=2, singularity_accuracy=1e-5,
-                 impedance_class=None):
-        super(PMCHWTOperator, self).__init__(integration_rule, basis_container,
-                                             background_material,
-                                             num_singular_terms,
-                                             singularity_accuracy,
-                                             impedance_class)
+    def __init__(
+        self,
+        integration_rule,
+        basis_container,
+        background_material,
+        num_singular_terms=2,
+        singularity_accuracy=1e-5,
+        impedance_class=None,
+    ):
+        super(PMCHWTOperator, self).__init__(
+            integration_rule,
+            basis_container,
+            background_material,
+            num_singular_terms,
+            singularity_accuracy,
+            impedance_class,
+        )
 
     def weights_o(self, s):
         "Weights for outer EFIE and MFIE problems"
@@ -213,24 +266,33 @@ class CTFOperator(TOperator):
     J' = eta_0*J are solved for. This improves the scaling of the eigenvalues,
     giving electric and magnetic modes similar eigenimpedances.
     """
+
     reciprocal = False
 
-    def __init__(self, integration_rule, basis_container,
-                 background_material,
-                 num_singular_terms=2, singularity_accuracy=1e-5,
-                 impedance_class=None):
-        super(CTFOperator, self).__init__(integration_rule, basis_container,
-                                          background_material,
-                                          num_singular_terms,
-                                          singularity_accuracy,
-                                          impedance_class)
+    def __init__(
+        self,
+        integration_rule,
+        basis_container,
+        background_material,
+        num_singular_terms=2,
+        singularity_accuracy=1e-5,
+        impedance_class=None,
+    ):
+        super(CTFOperator, self).__init__(
+            integration_rule,
+            basis_container,
+            background_material,
+            num_singular_terms,
+            singularity_accuracy,
+            impedance_class,
+        )
 
     def weights_o(self, s):
         "Weights for outer EFIE and MFIE problems"
         eta_o = self.background_material.eta_r(s)
-        return 1.0/eta_o, eta_o
+        return 1.0 / eta_o, eta_o
 
     def weights_i(self, s, part):
         "Weights for inner EFIE and MFIE problems, part specific"
         eta_i = part.material.eta_r(s)
-        return 1.0/eta_i, eta_i
+        return 1.0 / eta_i, eta_i

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,27 +15,28 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 OpenModes - An eigenmode solver for open electromagnetic resonantors
 """
 
-from openmodes.simulation import Simulation
-from openmodes.version import __version__
-
 # allow the user to find the provided geometry files
 import sys
+
+from openmodes.simulation import Simulation
+from openmodes.version import __version__
 
 if sys.version_info >= (3, 9):
     import importlib.resources as importlib_resources
 else:
     import importlib_resources
 
-geometry_dir = importlib_resources.files('openmodes') / 'geometry'
+geometry_dir = importlib_resources.files("openmodes") / "geometry"
 
 # setup jinja template location
 from jinja2 import Environment, PackageLoader
-template_env = Environment(loader=PackageLoader('openmodes', 'templates'))
+
+template_env = Environment(loader=PackageLoader("openmodes", "templates"))
 
 # Set the logging format of the root logger. By default it will not be
 # displayed. In order to display the log messages, run
@@ -44,10 +45,11 @@ template_env = Environment(loader=PackageLoader('openmodes', 'templates'))
 # detailed information.
 #
 import logging
-log_format = '%(levelname)s - %(asctime)s - %(message)s'
+
+log_format = "%(levelname)s - %(asctime)s - %(message)s"
 formatter = logging.Formatter(log_format)
 logger = logging.getLogger()
 for handler in logger.handlers:
     handler.formatter = formatter
 
-#__all__ = [openmodes.simulation.Simulation]
+# __all__ = [openmodes.simulation.Simulation]

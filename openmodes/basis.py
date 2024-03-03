@@ -22,20 +22,21 @@ Routines to construct the basis functions on a mesh
 
 import logging
 from collections import namedtuple
-from scipy.sparse import lil_matrix
-import numpy as np
 
-from openmodes.mesh import nodes_not_in_edge, shared_nodes
+import numpy as np
+from scipy.sparse import lil_matrix
+
+from openmodes.external.ordered_set import OrderedSet
 from openmodes.helpers import (
-    cached_property,
-    inc_slice,
     Identified,
-    memoize,
-    equivalence,
     MeshError,
+    cached_property,
+    equivalence,
+    inc_slice,
+    memoize,
 )
 from openmodes.integration import triangle_centres
-from openmodes.external.ordered_set import OrderedSet
+from openmodes.mesh import nodes_not_in_edge, shared_nodes
 from openmodes.parts import Part
 
 # A named tuple for holding the positive and negative triangles and nodes

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Routines to describe materials
 """
@@ -23,12 +23,13 @@ from __future__ import division
 
 import numpy as np
 
-from openmodes.helpers import Identified, wrap_if_constant
 from openmodes.constants import eta_0
+from openmodes.helpers import Identified, wrap_if_constant
 
 
 class IsotropicMaterial(Identified):
     "An isotropic material with a given permittivity and permeability"
+
     def __init__(self, name, epsilon_r, mu_r):
         super(IsotropicMaterial, self).__init__()
         self.name = name
@@ -37,15 +38,16 @@ class IsotropicMaterial(Identified):
 
     def eta(self, s):
         "Absolute impedance of the material"
-        return eta_0*self.eta_r(s)
+        return eta_0 * self.eta_r(s)
 
     def eta_r(self, s):
         "Impedance of the material relative to free space"
-        return np.sqrt(self.mu_r(s)/self.epsilon_r(s))
+        return np.sqrt(self.mu_r(s) / self.epsilon_r(s))
 
     def n(self, s):
         "Refractive index of the material"
-        return np.sqrt(self.mu_r(s)*self.epsilon_r(s))
+        return np.sqrt(self.mu_r(s) * self.epsilon_r(s))
+
 
 # a constant for free space
 FreeSpace = IsotropicMaterial("Free space", 1.0, 1.0)

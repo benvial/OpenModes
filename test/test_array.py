@@ -18,10 +18,12 @@
 # -----------------------------------------------------------------------------
 
 import os.path as osp
-from openmodes.array import LookupArray
-import openmodes
+
 import numpy as np
 import pytest
+
+import openmodes
+from openmodes.array import LookupArray
 
 
 def test_indexing():
@@ -40,25 +42,25 @@ def test_indexing():
     basis = sim.basis_container[srr1]
     basis_len = len(basis)
 
-    A = LookupArray(((group1, sim.basis_container),
-                     (group2, sim.basis_container), 5, 3))
+    A = LookupArray(
+        ((group1, sim.basis_container), (group2, sim.basis_container), 5, 3)
+    )
 
-    assert(A.shape == (2*basis_len, basis_len, 5, 3))
+    assert A.shape == (2 * basis_len, basis_len, 5, 3)
 
     A[group1, srr3] = 22.5
-    assert(np.all(A[srr1, :] == 22.5))
-    assert(np.all(A[srr2] == 22.5))
+    assert np.all(A[srr1, :] == 22.5)
+    assert np.all(A[srr2] == 22.5)
 
-    V = LookupArray((("E", "H"), (sim.parts, sim.basis_container)),
-                    dtype=np.complex128)
+    V = LookupArray((("E", "H"), (sim.parts, sim.basis_container)), dtype=np.complex128)
 
-    V["E", group1] = -4.7+22j
+    V["E", group1] = -4.7 + 22j
     V["H", srr1] = 5.2
     V["H", srr2] = 6.7
 
-    assert(np.all(V["E", group1] == V["E"][group1]))
-    assert(np.all(V["E", srr1] == -4.7+22j))
-    assert(np.all(V["E", srr2].imag == 22))
+    assert np.all(V["E", group1] == V["E"][group1])
+    assert np.all(V["E", srr1] == -4.7 + 22j)
+    assert np.all(V["E", srr2].imag == 22)
 
 
 def test_list_indexing():
@@ -69,12 +71,18 @@ def test_list_indexing():
     srr1 = sim.place_part(mesh)
     srr2 = sim.place_part(mesh)
 
-    res = LookupArray((sim.operator.unknowns, (sim.parts, sim.basis_container),
-                      ('modes',), (srr2, sim.basis_container)),
-                     dtype=np.complex128)
+    res = LookupArray(
+        (
+            sim.operator.unknowns,
+            (sim.parts, sim.basis_container),
+            ("modes",),
+            (srr2, sim.basis_container),
+        ),
+        dtype=np.complex128,
+    )
 
-    # with pytest.warns(UserWarning):
-    #     res[0, :, 0, [2]]
+    with pytest.warns(UserWarning):
+        res[0, :, 0, [2]]
 
 
 if __name__ == "__main__":

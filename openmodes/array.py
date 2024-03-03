@@ -20,12 +20,14 @@
 
 from __future__ import division
 
-import numpy as np
-from openmodes.parts import Part
 import numbers
-import six
-import warnings
 import sys
+import warnings
+
+import numpy as np
+import six
+
+from openmodes.parts import Part
 
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:
     from collections.abc import Iterable
@@ -37,12 +39,12 @@ def part_ranges_lowest(parent_part, basis_container):
     """Construct the slice objects for the parent part, iterating down only
     to the specified lowest level"""
 
-    lowest = getattr(basis_container, 'lowest_parts', None)
+    lowest = getattr(basis_container, "lowest_parts", None)
 
     # get the size of each child part
     sizes = [len(basis_container[part]) for part in parent_part.iter_lowest(lowest)]
 
-    offsets = np.cumsum([0]+sizes)
+    offsets = np.cumsum([0] + sizes)
 
     ranges = {}
 
@@ -50,9 +52,9 @@ def part_ranges_lowest(parent_part, basis_container):
     lowest_part_num = 0
 
     # iterate with parents last, so they can get data from their child objects
-    for part in parent_part.iter_lowest(lowest, parent_order='after'):
+    for part in parent_part.iter_lowest(lowest, parent_order="after"):
         if part in lowest:
-            ranges[part] = slice(offsets[lowest_part_num], offsets[lowest_part_num+1])
+            ranges[part] = slice(offsets[lowest_part_num], offsets[lowest_part_num + 1])
             lowest_part_num += 1
         else:
             # take slice information from first and last child
@@ -65,12 +67,12 @@ def part_ranges_lowest(parent_part, basis_container):
 
 def part_ranges(parent_part, basis_container):
     "Construct the slice objects for the parent part and all of its children"
-    if hasattr(basis_container, 'lowest_parts'):
+    if hasattr(basis_container, "lowest_parts"):
         return part_ranges_lowest(parent_part, basis_container)
 
     # get the size of each child part
     sizes = [len(basis_container[part]) for part in parent_part.iter_single()]
-    offsets = np.cumsum([0]+sizes)
+    offsets = np.cumsum([0] + sizes)
 
     ranges = {}
 
@@ -79,13 +81,13 @@ def part_ranges(parent_part, basis_container):
 
     # iterate with parents last, so they can get data from their child objects
     for part in parent_part.iter_all(parent_first=False):
-        if hasattr(part, 'children'):
+        if hasattr(part, "children"):
             # take slice information from first and last child
             start = ranges[part.children[0]].start
             stop = ranges[part.children[-1]].stop
             ranges[part] = slice(start, stop)
         else:
-            ranges[part] = slice(offsets[single_part_num], offsets[single_part_num+1])
+            ranges[part] = slice(offsets[single_part_num], offsets[single_part_num + 1])
             single_part_num += 1
 
     return ranges
@@ -110,7 +112,7 @@ def build_lookup(index_data):
         else:
             # A tuple of strings representing quantities
             this_lookup = {}
-            for (x, y) in enumerate(index):
+            for x, y in enumerate(index):
                 if not isinstance(y, six.string_types):
                     raise ValueError("Unknown index type %s" % str(y))
                 this_lookup[y] = x
@@ -187,7 +189,7 @@ class LookupArray(np.ndarray):
             return
 
         # set default values for the custom attributes
-        self.lookup = getattr(obj, 'lookup', None)
+        self.lookup = getattr(obj, "lookup", None)
 
     def __setstate__(self, state):
         """Allow additional attributes of this array type to be unpickled
@@ -195,7 +197,7 @@ class LookupArray(np.ndarray):
         Note that some metadata may be lost when unpickling."""
         base_state, extended_state = state
         super(LookupArray, self).__setstate__(base_state)
-        self.lookup, = extended_state
+        (self.lookup,) = extended_state
 
     def __reduce__(self):
         """Allow additional attributes of this array type to be pickled
@@ -222,7 +224,7 @@ class LookupArray(np.ndarray):
 
         if not isinstance(idx, tuple):
             # force a single index to be a tuple
-            idx = idx,
+            idx = (idx,)
 
         new_idx = []
         sub_lookup = []
@@ -257,7 +259,9 @@ class LookupArray(np.ndarray):
                         sub_lookup.append(self.lookup[entry_num])
                     elif isinstance(entry, Iterable):
                         # TODO: find a better solution to avoid this probelm
-                        # warnings.warn("Indexing LookupArray with iterable is unreliable")
+                        warnings.warn(
+                            "Indexing LookupArray with iterable is unreliable"
+                        )
                         pass
                     else:
                         # In all other cases metadata is lost
@@ -266,13 +270,13 @@ class LookupArray(np.ndarray):
             entry_num += 1
 
         # now add lookup data for all the non-indexed dimensions
-        sub_lookup = sub_lookup+self.lookup[entry_num:]
+        sub_lookup = sub_lookup + self.lookup[entry_num:]
 
         try:
             result = super(LookupArray, self).__getitem__(tuple(new_idx))
         except IndexError as exc:
             message = "Invalid index %s" % str(idx)
-            exc.args = (message,)+tuple(str(n) for n in exc.args[1:])
+            exc.args = (message,) + tuple(str(n) for n in exc.args[1:])
             raise
 
         # May get a LookupArray or an array scalar back
@@ -286,7 +290,7 @@ class LookupArray(np.ndarray):
         name of a range, in addition to all the usual fancy indexing options"""
         if not isinstance(idx, tuple):
             # force a single index to be a tuple
-            idx = idx,
+            idx = (idx,)
 
         new_idx = []
 
@@ -305,7 +309,7 @@ class LookupArray(np.ndarray):
             super(LookupArray, self).__setitem__(tuple(new_idx), value)
         except IndexError as exc:
             message = "Invalid index %s" % idx
-            exc.args = (message,)+tuple(str(n) for n in exc.args[1:])
+            exc.args = (message,) + tuple(str(n) for n in exc.args[1:])
             raise
 
     def transpose(self, **args):
@@ -314,7 +318,7 @@ class LookupArray(np.ndarray):
     @property
     def T(self):
         result = super(LookupArray, self).T
-        assert(type(result) == LookupArray)
+        assert type(result) == LookupArray
         result.lookup = list(reversed(self.lookup))
         return result
 
@@ -334,12 +338,14 @@ class LookupArray(np.ndarray):
     def dot(self, other):
         """Matrix/vector multiplication with another LookupArray"""
         if not isinstance(other, LookupArray):
-            assert(self.shape[-1] == other.shape[0])
-            new_lookup = self.lookup[:-1]+[None,]*(other.ndim-1)
-            new_shape = self.shape[:-1]+other.shape[1:]
+            assert self.shape[-1] == other.shape[0]
+            new_lookup = self.lookup[:-1] + [
+                None,
+            ] * (other.ndim - 1)
+            new_shape = self.shape[:-1] + other.shape[1:]
         elif compatible_quantity_part(self.lookup[-2:], other.lookup[:2]):
-            new_lookup = self.lookup[:-2]+other.lookup[2:]
-            new_shape = self.shape[:-2]+other.shape[2:]
+            new_lookup = self.lookup[:-2] + other.lookup[2:]
+            new_shape = self.shape[:-2] + other.shape[2:]
             other = other.simple_view()
         else:
             raise NotImplementedError
@@ -348,8 +354,11 @@ class LookupArray(np.ndarray):
             # handle the case of a scalar result
             new_array = np.dot(self.simple_view(), other)
         else:
-            new_array = LookupArray(lookup=new_lookup, shape=new_shape,
-                                    dtype=np.promote_types(self.dtype, other.dtype))
+            new_array = LookupArray(
+                lookup=new_lookup,
+                shape=new_shape,
+                dtype=np.promote_types(self.dtype, other.dtype),
+            )
             new_array.simple_view()[:] = np.dot(self.simple_view(), other)
         return new_array
 
@@ -398,8 +407,9 @@ def loop_star_indices(x):
             star_list = []
             # First find the parent part, the one covering the largest range
             part_list = list(lookup[0].keys())
-            parent_part = part_list[np.argmax(lookup[n].stop-lookup[n].start
-                                              for n in part_list)]
+            parent_part = part_list[
+                np.argmax(lookup[n].stop - lookup[n].start for n in part_list)
+            ]
 
             # now iterate over all SingleParts of this parent part
             for part in parent_part.iter_single():
@@ -407,17 +417,23 @@ def loop_star_indices(x):
 
                 bf = lookup[1][part]
                 loop_range = bf.loop_range
-                loop_list.append(np.arange(loop_range.start+part_start,
-                                           loop_range.stop+part_start))
+                loop_list.append(
+                    np.arange(
+                        loop_range.start + part_start, loop_range.stop + part_start
+                    )
+                )
 
                 star_range = bf.star_range
-                star_list.append(np.arange(star_range.start+part_start,
-                                           star_range.stop+part_start))
+                star_list.append(
+                    np.arange(
+                        star_range.start + part_start, star_range.stop + part_start
+                    )
+                )
 
             # If this is not the last axis, then add the necessary number of
             # extra dimensions to each array so that they will be broadcast
             # correctly when the caller goes to use them
-            new_shape = (-1,)+(1,)*(x.ndim-lookup_num-1)
+            new_shape = (-1,) + (1,) * (x.ndim - lookup_num - 1)
             loop_array = np.hstack(loop_list).reshape(new_shape)
             star_array = np.hstack(star_list).reshape(new_shape)
 

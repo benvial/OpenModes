@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,21 +15,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import functools
+import numbers
 import uuid
 import weakref
-import numpy as np
-import numbers
 from collections import defaultdict
+
+import numpy as np
 import six
 
 
 def inc_slice(s, inc):
     """Increment a slice so that it starts at the current stop, and the current
     stop is incremented by some amount"""
-    return slice(s.stop, s.stop+inc)
+    return slice(s.stop, s.stop + inc)
 
 
 class cached_property(object):
@@ -43,7 +44,7 @@ class cached_property(object):
     """
 
     def __init__(self, func):
-        self.__doc__ = getattr(func, '__doc__')
+        self.__doc__ = getattr(func, "__doc__")
         self.func = func
 
     def __get__(self, obj, cls):
@@ -71,13 +72,15 @@ class Identified(object):
         return self.id.__hash__()
 
     def __eq__(self, other):
-        return hasattr(other, 'id') and (self.id == other.id)
+        return hasattr(other, "id") and (self.id == other.id)
 
     def __repr__(self):
         "Represent the object by its id, in addition to its memory address"
-        return ("<%s at 0x%08x with id %s>" % (str(self.__class__)[8:-2],
-                                               id(self),
-                                               str(self.id)))
+        return "<%s at 0x%08x with id %s>" % (
+            str(self.__class__)[8:-2],
+            id(self),
+            str(self.id),
+        )
 
 
 class PicklableRef(object):
@@ -95,10 +98,10 @@ class PicklableRef(object):
         return self.ref()
 
     def __getstate__(self):
-        return {'ref': self.ref()}
+        return {"ref": self.ref()}
 
     def __setstate__(self, state):
-        self.ref = weakref.ref(state['ref'])
+        self.ref = weakref.ref(state["ref"])
 
 
 def memoize(obj):
@@ -114,20 +117,20 @@ def memoize(obj):
         elif isinstance(item, Identified):
             return str(item.id)
         elif isinstance(item, np.ndarray):
-            return item.tostring()
+            return item.tobytes()
         else:
             return str(item)
 
     @functools.wraps(obj)
     def memoizer(*args, **kwargs):
         key_arg = tuple(get_key(arg) for arg in args)
-        key_kwarg = tuple((kw, get_key(arg)) for (kw, arg)
-                          in kwargs.items())
+        key_kwarg = tuple((kw, get_key(arg)) for (kw, arg) in kwargs.items())
         key = (key_arg, key_kwarg)
 
         if key not in cache:
             cache[key] = obj(*args, **kwargs)
         return cache[key]
+
     return memoizer
 
 
@@ -186,7 +189,7 @@ def equivalence(relations):
 def wrap_if_constant(func):
     """If passed a constant, wrap it in a function. If passed a function, just
     return it as is"""
-    if hasattr(func, '__call__'):
+    if hasattr(func, "__call__"):
         return func
     else:
         return lambda x: func

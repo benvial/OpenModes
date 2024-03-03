@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,29 +15,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Routines which are specific to operation within the IPython notebook"""
 
-from six.moves import StringIO
 import os.path as osp
+
+from six.moves import StringIO
+
 try:
     from ipywidgets import FloatProgress, HBox, Label
 except ImportError:
     # retain deprecated import for IPython 3 compatibility
     from IPython.html.widgets import FloatProgress, HBox, Label
-from IPython.display import HTML, display
-import numpy as np
-import uuid
+
 import json
-import matplotlib
 import logging
+import uuid
 
-from openmodes.mesh import combine_mesh
-from openmodes import template_env
-
+import matplotlib
+import numpy as np
+from IPython.display import HTML, display
 from pkg_resources import resource_filename
-three_js_dir = resource_filename('openmodes', osp.join('external', 'three.js'))
-static_dir = resource_filename('openmodes', 'static')
+
+from openmodes import template_env
+from openmodes.mesh import combine_mesh
+
+three_js_dir = resource_filename("openmodes", osp.join("external", "three.js"))
+static_dir = resource_filename("openmodes", "static")
 
 
 def init_3d():
@@ -47,15 +51,22 @@ def init_3d():
 
     library_javascript = StringIO()
 
-    library_javascript.write("""
+    library_javascript.write(
+        """
     <script type="text/javascript">
     /* Beginning of javascript injected by OpenModes */
     var openmodes_javascript_injected = true;
-    """)
+    """
+    )
 
-    three_js_libraries = ("three.min.js", "OrbitControls.js",
-                          "Lut.js", "Detector.js", "CanvasRenderer.js",
-                          "Projector.js")
+    three_js_libraries = (
+        "three.min.js",
+        "OrbitControls.js",
+        "Lut.js",
+        "Detector.js",
+        "CanvasRenderer.js",
+        "Projector.js",
+    )
 
     # Include required parts of three.js inline
     for library in three_js_libraries:
@@ -67,14 +78,23 @@ def init_3d():
         library_javascript.write(infile.read())
 
     library_javascript.write(
-                "/* End of javascript injected by OpenModes */\n</script>\n")
+        "/* End of javascript injected by OpenModes */\n</script>\n"
+    )
 
     display(HTML(library_javascript.getvalue()))
     logging.info("Javascript injected for 3D interactive WebGL plots")
 
 
-def plot_3d(parts_list, charges, currents, centres, width=700, height=500,
-            wireframe=False, skip_webgl=False):
+def plot_3d(
+    parts_list,
+    charges,
+    currents,
+    centres,
+    width=700,
+    height=500,
+    wireframe=False,
+    skip_webgl=False,
+):
     """Create a 3D plot in the IPython notebook
 
     Parameters
@@ -110,24 +130,28 @@ def plot_3d(parts_list, charges, currents, centres, width=700, height=500,
 
     # combine the meshes
     # scale all nodes so that the maximum size is known
-    mesh_scale = 100/full_mesh.fast_size()
-    full_mesh.nodes = full_mesh.nodes*mesh_scale
+    mesh_scale = 100 / full_mesh.fast_size()
+    full_mesh.nodes = full_mesh.nodes * mesh_scale
 
     # generate a javascript representation of the object
-    geometry_name = "geometry_"+str(uuid.uuid4()).replace('-', '')
+    geometry_name = "geometry_" + str(uuid.uuid4()).replace("-", "")
     geometry_javascript = StringIO()
     geometry_javascript.write("var %s = " % geometry_name)
 
-    geometry_tree = {'nodes': full_mesh.nodes.tolist(),
-                     'triangles': full_mesh.polygons.tolist()}
+    geometry_tree = {
+        "nodes": full_mesh.nodes.tolist(),
+        "triangles": full_mesh.polygons.tolist(),
+    }
 
     # include the charge information if it is present
     if charges is not None:
         charges = np.hstack(charges)
-        geometry_tree['charge'] = {'real': charges.real.tolist(),
-                                   'imag': charges.imag.tolist(),
-                                   'abs':  abs(charges).tolist(),
-                                   'phase': np.angle(charges, deg=True).tolist()}
+        geometry_tree["charge"] = {
+            "real": charges.real.tolist(),
+            "imag": charges.imag.tolist(),
+            "abs": abs(charges).tolist(),
+            "phase": np.angle(charges, deg=True).tolist(),
+        }
 
     # Include the current information if it is present. Vectors will be of
     # the form (length, x, y, z), where the 3 cartesian components are scaled
@@ -137,7 +161,7 @@ def plot_3d(parts_list, charges, currents, centres, width=700, height=500,
         lengths_real = np.sqrt(np.sum(currents.real**2, axis=1))
         currents.real /= lengths_real[:, None]
         current_real = np.hstack((lengths_real[:, None], currents.real)).tolist()
-        
+
         if np.any(np.iscomplex(currents)):
             lengths_imag = np.sqrt(np.sum(currents.imag**2, axis=1))
             currents.imag /= lengths_imag[:, None]
@@ -145,21 +169,25 @@ def plot_3d(parts_list, charges, currents, centres, width=700, height=500,
         else:
             current_imag = np.zeros((currents.shape[0], 4)).tolist()
 
-        geometry_tree['current'] = {'real': current_real, 'imag': current_imag}
-        geometry_tree['centres'] = (np.vstack(centres)*mesh_scale).tolist()
+        geometry_tree["current"] = {"real": current_real, "imag": current_imag}
+        geometry_tree["centres"] = (np.vstack(centres) * mesh_scale).tolist()
 
     json.dump(geometry_tree, geometry_javascript)
 
-    geometry_javascript.write(';')
+    geometry_javascript.write(";")
 
-    html_source = template_env.get_template('three_js_plot.html')
-    html_generated = html_source.render({'geometry_javascript': geometry_javascript,
-                                         'geometry_name': geometry_name,
-                                         'canvas_width': width,
-                                         'canvas_height': height,
-                                         'initial_wireframe': wireframe,
-                                         'skip_webgl': skip_webgl,
-                                         'current_vector_len': np.median(full_mesh.edge_lens)})
+    html_source = template_env.get_template("three_js_plot.html")
+    html_generated = html_source.render(
+        {
+            "geometry_javascript": geometry_javascript,
+            "geometry_name": geometry_name,
+            "canvas_width": width,
+            "canvas_height": height,
+            "initial_wireframe": wireframe,
+            "skip_webgl": skip_webgl,
+            "current_vector_len": np.median(full_mesh.edge_lens),
+        }
+    )
 
     display(HTML(html_generated))
 
@@ -167,14 +195,14 @@ def plot_3d(parts_list, charges, currents, centres, width=700, height=500,
 def matplotlib_defaults():
     "Set some nicer defaults for matplotlib plots for ipython notebooks"
     rcp = matplotlib.rcParams
-    rcp['figure.figsize'] = (8, 5)
-    rcp['lines.linewidth'] = 1.0
-    rcp['lines.markeredgewidth'] = 2.0
-    rcp['axes.labelsize'] = 12
-    rcp['font.size'] = 12
-    rcp['patch.linewidth'] = 1.0
-    rcp['figure.facecolor'] = 'white'
-    rcp['figure.edgecolor'] = 'white'
+    rcp["figure.figsize"] = (8, 5)
+    rcp["lines.linewidth"] = 1.0
+    rcp["lines.markeredgewidth"] = 2.0
+    rcp["axes.labelsize"] = 12
+    rcp["font.size"] = 12
+    rcp["patch.linewidth"] = 1.0
+    rcp["figure.facecolor"] = "white"
+    rcp["figure.edgecolor"] = "white"
 
 
 def progress_iterator(orig_iterator, description):
@@ -188,9 +216,9 @@ def progress_iterator(orig_iterator, description):
     description: string
         Description will give a text label for the bar.
     """
-    progress_widget = FloatProgress(min=0, max=len(orig_iterator)-1)
+    progress_widget = FloatProgress(min=0, max=len(orig_iterator) - 1)
     widget = HBox([Label(description), progress_widget])
     display(widget)
     for count, val in enumerate(orig_iterator):
         yield val
-        progress_widget.value = count        
+        progress_widget.value = count

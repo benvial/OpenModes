@@ -22,10 +22,12 @@ derived quantities
 """
 
 import logging
-import numpy as np
-from openmodes.helpers import Identified, cached_property
-from openmodes.external.ordered_set import OrderedSet
 from collections import OrderedDict
+
+import numpy as np
+
+from openmodes.external.ordered_set import OrderedSet
+from openmodes.helpers import Identified, cached_property
 
 
 def nodes_not_in_edge(nodes, edge):

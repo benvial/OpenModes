@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Routines for displaying parts and solutions.
 """
@@ -27,11 +27,16 @@ from openmodes.mesh import combine_mesh
 def compress(func, factor, max_val=None):
     "Compress a function to smooth out extreme values"
     max_val = max_val or max(abs(func))
-    return np.tanh(abs(func)*factor/max_val)*np.exp(1j*np.angle(func))
+    return np.tanh(abs(func) * factor / max_val) * np.exp(1j * np.angle(func))
 
 
-def preprocess(parts, solution=None, basis_container=None,
-               compress_scalars=None, compress_separately=False):
+def preprocess(
+    parts,
+    solution=None,
+    basis_container=None,
+    compress_scalars=None,
+    compress_separately=False,
+):
     """Pre-process the parts and solution before plotting, including scaling
 
     Parameters
@@ -64,9 +69,9 @@ def preprocess(parts, solution=None, basis_container=None,
         I = solution[part]
         basis = basis_container[part]
 
-        centre, current, charge = basis.interpolate_function(I,
-                                                        return_scalar=True,
-                                                        nodes=part.nodes)
+        centre, current, charge = basis.interpolate_function(
+            I, return_scalar=True, nodes=part.nodes
+        )
 
         if compress_scalars:
             if compress_separately:
@@ -85,7 +90,7 @@ def preprocess(parts, solution=None, basis_container=None,
     return parts_list, charges, currents, centres
 
 
-def plot_parts(parts, figsize=(10, 4), view_angles = (40, 90)):
+def plot_parts(parts, figsize=(10, 4), view_angles=(40, 90)):
     """Create a simple 3D plot to show the location of loaded parts in space
 
     Parameters
@@ -105,23 +110,30 @@ def plot_parts(parts, figsize=(10, 4), view_angles = (40, 90)):
     from mpl_toolkits.mplot3d import Axes3D
 
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
 
     for part in parts.iter_single():
         mesh = part.mesh
 
         for edge in mesh.get_edges():
             nodes = part.nodes[edge]
-            ax.plot(nodes[:, 0], nodes[:, 1], nodes[:, 2], 'k')
+            ax.plot(nodes[:, 0], nodes[:, 1], nodes[:, 2], "k")
 
     ax.view_init(*view_angles)
     ax.autoscale()
     plt.show()
 
 
-def plot_mayavi(parts, scalar_function=None, vector_function=None,
-                vector_points=None, scalar_name="scalar", vector_name="vector",
-                compress_scalars=None, filename=None):
+def plot_mayavi(
+    parts,
+    scalar_function=None,
+    vector_function=None,
+    vector_points=None,
+    scalar_name="scalar",
+    vector_name="vector",
+    compress_scalars=None,
+    filename=None,
+):
     """Generate a mayavi plot of the mesh of the parts, and optionally also
     show a plot of vector and scalar functions defined on its surface.
 
@@ -153,8 +165,10 @@ def plot_mayavi(parts, scalar_function=None, vector_function=None,
     try:
         from mayavi import mlab
     except ImportError:
-        raise ImportError("Please ensure that Enthought Mayavi is correctly " +
-                          "installed before calling this function")
+        raise ImportError(
+            "Please ensure that Enthought Mayavi is correctly "
+            + "installed before calling this function"
+        )
 
     # If plotting a scalar function, plotting the mesh lines tends to make
     # the plot too busy, so switch them off.
@@ -173,15 +187,19 @@ def plot_mayavi(parts, scalar_function=None, vector_function=None,
 
         triangle_nodes = part.mesh.polygons
         nodes = part.nodes
-        tri_plot = mlab.triangular_mesh(nodes[:, 0], nodes[:, 1], nodes[:, 2],
-                                        triangle_nodes,
-                                        representation='wireframe',
-                                        color=(0, 0, 0), line_width=0.5,
-                                        opacity=opacity)
+        tri_plot = mlab.triangular_mesh(
+            nodes[:, 0],
+            nodes[:, 1],
+            nodes[:, 2],
+            triangle_nodes,
+            representation="wireframe",
+            color=(0, 0, 0),
+            line_width=0.5,
+            opacity=opacity,
+        )
         if scalar_function is not None:
             if compress_scalars:
-                part_scalars = compress(scalar_function[part_num],
-                                        compress_scalars)
+                part_scalars = compress(scalar_function[part_num], compress_scalars)
             else:
                 part_scalars = scalar_function[part_num]
 
@@ -190,16 +208,25 @@ def plot_mayavi(parts, scalar_function=None, vector_function=None,
             cell_data.scalars.name = scalar_name
             cell_data.update()
 
-            mesh2 = mlab.pipeline.set_active_attribute(tri_plot,
-                    cell_scalars=scalar_name)
+            mesh2 = mlab.pipeline.set_active_attribute(
+                tri_plot, cell_scalars=scalar_name
+            )
             mlab.pipeline.surface(mesh2)
 
         if vector_function is not None:
             points = vector_points[part_num]
             vectors = vector_function[part_num].real
-            mlab.quiver3d(points[:, 0], points[:, 1], points[:, 2],
-                          vectors[:, 0], vectors[:, 1], vectors[:, 2],
-                          color=(0, 0, 0), opacity=0.75, line_width=1.0)
+            mlab.quiver3d(
+                points[:, 0],
+                points[:, 1],
+                points[:, 2],
+                vectors[:, 0],
+                vectors[:, 1],
+                vectors[:, 2],
+                color=(0, 0, 0),
+                opacity=0.75,
+                line_width=1.0,
+            )
 
         mlab.view(0)
     if filename is None:
@@ -208,11 +235,16 @@ def plot_mayavi(parts, scalar_function=None, vector_function=None,
         mlab.savefig(filename)
         mlab.options.offscreen = offscreen
 
-scalar_names = {'J': 'rho_e', 'M': 'rho_m'}
+
+scalar_names = {"J": "rho_e", "M": "rho_m"}
 
 # Reduce precision for some types
-vtk_type_map = {np.int32: 'Int32', np.int64: 'Int32',
-                np.float32: 'Float32', np.float64: 'Float32'}
+vtk_type_map = {
+    np.int32: "Int32",
+    np.int64: "Int32",
+    np.float32: "Float32",
+    np.float64: "Float32",
+}
 vtk_type_map = {np.dtype(key): val for key, val in vtk_type_map.items()}
 
 
@@ -228,7 +260,7 @@ def vtk_da(doc, ar, name=None, type_name=None):
         type_name = vtk_type_map[ar.dtype]
     da.setAttribute("type", type_name)
     da.setAttribute("format", "ascii")
-    
+
     if name is not None:
         da.setAttribute("Name", name)
 
@@ -258,8 +290,8 @@ def write_vtk(parts, filename, solution=None, basis_container=None):
         The basis container, required if a solution is given
     """
 
-    import xml.dom.minidom
     import sys
+    import xml.dom.minidom
 
     doc = xml.dom.minidom.Document()
     root = doc.createElementNS("VTK", "VTKFile")
@@ -267,7 +299,7 @@ def write_vtk(parts, filename, solution=None, basis_container=None):
     root.setAttribute("type", "PolyData")
     root.setAttribute("version", "0.1")
 
-    if sys.byteorder == 'little':
+    if sys.byteorder == "little":
         root.setAttribute("byte_order", "LittleEndian")
     else:
         root.setAttribute("byte_order", "BigEndian")
@@ -296,7 +328,9 @@ def write_vtk(parts, filename, solution=None, basis_container=None):
         polys = doc.createElementNS("VTK", "Polys")
         piece.appendChild(polys)
         polys.appendChild(vtk_da(doc, mesh.polygons.flatten(), "connectivity"))
-        polys.appendChild(vtk_da(doc, np.cumsum([len(y) for y in mesh.polygons]), "offsets"))
+        polys.appendChild(
+            vtk_da(doc, np.cumsum([len(y) for y in mesh.polygons]), "offsets")
+        )
 
         if solution is None:
             continue
@@ -309,21 +343,21 @@ def write_vtk(parts, filename, solution=None, basis_container=None):
         # Iterate over multiple quantities (e.g. electric and magnetic current)
         for sol in solution.lookup[0]:
             # Get the current at the centre of the triangle, and its divergence
-            centre, current, charge = basis.interpolate_function(solution[sol, part],
-                                                                 return_scalar=True,
-                                                                 nodes=part.nodes)
+            centre, current, charge = basis.interpolate_function(
+                solution[sol, part], return_scalar=True, nodes=part.nodes
+            )
             try:
                 scalar_name = scalar_names[sol]
             except KeyError:
-                scalar_name = "scalar_"+sol
+                scalar_name = "scalar_" + sol
 
             # The real and imaginary parts of the charge and current
-            celldata.appendChild(vtk_da(doc, charge.real, scalar_name+"_real"))
-            celldata.appendChild(vtk_da(doc, charge.imag, scalar_name+"_imag"))
-            celldata.appendChild(vtk_da(doc, current.real, sol+"_real"))
-            celldata.appendChild(vtk_da(doc, current.imag, sol+"_imag"))
+            celldata.appendChild(vtk_da(doc, charge.real, scalar_name + "_real"))
+            celldata.appendChild(vtk_da(doc, charge.imag, scalar_name + "_imag"))
+            celldata.appendChild(vtk_da(doc, current.real, sol + "_real"))
+            celldata.appendChild(vtk_da(doc, current.imag, sol + "_imag"))
 
         piece.appendChild(celldata)
 
     with open(filename, "w") as outfile:
-        doc.writexml(outfile, newl='\n', addindent='  ')
+        doc.writexml(outfile, newl="\n", addindent="  ")

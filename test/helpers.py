@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,13 +15,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Helper routines for tests"""
 
-import numpy as np
-import os.path as osp
 import os
+import os.path as osp
 import pickle
+
+import numpy as np
 from numpy.testing import assert_allclose
 
 
@@ -39,7 +40,7 @@ def read_1d_complex(filename):
     with open(filename, "rt") as infile:
         for d in infile:
             d = d.split()
-            data.append(float(d[0])+1j*float(d[1]))
+            data.append(float(d[0]) + 1j * float(d[1]))
 
     return np.array(data, dtype=np.complex128)
 
@@ -68,7 +69,7 @@ def read_2d_real(filename):
 def get_test_dir(tests_filename):
     location, fname = osp.split(tests_filename)
     fname = osp.splitext(fname)[0]
-    test_dir = osp.join(location, 'reference', fname)
+    test_dir = osp.join(location, "reference", fname)
     if not osp.exists(test_dir):
         os.makedirs(test_dir)
     return test_dir
@@ -77,7 +78,7 @@ def get_test_dir(tests_filename):
 def get_input_dir(tests_filename, name=None):
     location, fname = osp.split(tests_filename)
     fname = osp.splitext(fname)[0]
-    input_dir = osp.join(location, 'input', fname)
+    input_dir = osp.join(location, "input", fname)
     if name is not None:
         input_dir = osp.join(input_dir, name)
     if not osp.exists(input_dir):
@@ -89,15 +90,21 @@ def compare_ref(val, reference, rtol, name):
     "Compare a value against a stored reference"
     if isinstance(val, np.ndarray):
         # Compare numpy arrays
-        assert_allclose(val, reference, rtol=rtol,
-                        err_msg='Result "{}" differs from reference'.format(name))
+        assert_allclose(
+            val,
+            reference,
+            rtol=rtol,
+            err_msg='Result "{}" differs from reference'.format(name),
+        )
     elif isinstance(val, dict):
         # Compare dictionaries, ensuring keys and all values are the same
-        assert(set(val.keys()) == set(reference.keys()))
+        assert set(val.keys()) == set(reference.keys())
         for key in val.keys():
             compare_ref(val[key], reference[key], rtol, "{}[{}]".format(name, key))
     else:
-        raise ValueError("Unable to compare {} of type {} to reference".format(name, type(val)))
+        raise ValueError(
+            "Unable to compare {} of type {} to reference".format(name, type(val))
+        )
 
 
 def run_test(func, tests_filename):
@@ -105,13 +112,13 @@ def run_test(func, tests_filename):
     results = func()
     test_dir = get_test_dir(tests_filename)
 
-    with open(osp.join(test_dir, results['name'])+".pickle", "rb") as infile:
+    with open(osp.join(test_dir, results["name"]) + ".pickle", "rb") as infile:
         reference = pickle.load(infile)
 
-    assert(set(reference.keys()) == set(results['results'].keys()))
-    for name, val in results['results'].items():
+    assert set(reference.keys()) == set(results["results"].keys())
+    for name, val in results["results"].items():
         try:
-            rtol = results['rtol'][name]
+            rtol = results["rtol"][name]
         except:
             rtol = 1e-7
 
@@ -123,5 +130,5 @@ def create_reference(func, tests_filename):
     results = func()
     test_dir = get_test_dir(tests_filename)
 
-    with open(osp.join(test_dir, results['name'])+".pickle", "wb") as outfile:
-        pickle.dump(results['results'], outfile, protocol=2, fix_imports=True)
+    with open(osp.join(test_dir, results["name"]) + ".pickle", "wb") as outfile:
+        pickle.dump(results["results"], outfile, protocol=2, fix_imports=True)

@@ -20,16 +20,16 @@
 
 from __future__ import division
 
-import numpy as np
-
 import FreeCAD
-import Part
 import MeshPart
+import numpy as np
+import Part
 
 
 def freecad_mesh(geometry):
-    mesh = MeshPart.meshFromShape(geometry, Fineness=2, SecondOrder=0,
-                                  Optimize=1, AllowQuad=0)
+    mesh = MeshPart.meshFromShape(
+        geometry, Fineness=2, SecondOrder=0, Optimize=1, AllowQuad=0
+    )
 
     result = {}
 
@@ -41,7 +41,7 @@ def freecad_mesh(geometry):
         points.append([point.x, point.y, point.z])
         point_ids[point.Index] = point_count
 
-    result['nodes'] = np.array(points, dtype=np.float64)
+    result["nodes"] = np.array(points, dtype=np.float64)
 
     triangles = []
     for facet_count, facet in enumerate(mesh.Facets):
@@ -49,7 +49,7 @@ def freecad_mesh(geometry):
             raise NotImplementedError("Only triangles currently supported")
         triangles.append([point_ids[n] for n in facet.PointIndices])
 
-    result['triangles'] = np.array(triangles)
+    result["triangles"] = np.array(triangles)
 
     return result
 
@@ -66,7 +66,7 @@ def box(x, y, z, rounding=None):
     """
     box = Part.makeBox(x, y, z)
 
-    centre = FreeCAD.Vector(-0.5*x, -0.5*y, -0.5*z)
+    centre = FreeCAD.Vector(-0.5 * x, -0.5 * y, -0.5 * z)
     box.Placement.Base = centre
 
     if rounding is not None:
@@ -74,7 +74,7 @@ def box(x, y, z, rounding=None):
     return box
 
 
-#bar = box(500, 150, 200, 10)
-#mesh = freecad_mesh(bar)
+# bar = box(500, 150, 200, 10)
+# mesh = freecad_mesh(bar)
 
-#MeshPart.meshFromShape(box,GrowthRate=0.3,SegPerEdge=1,SegPerRadius=2,SecondOrder=0,Optimize=1,AllowQuad=0)
+# MeshPart.meshFromShape(box,GrowthRate=0.3,SegPerEdge=1,SegPerRadius=2,SecondOrder=0,Optimize=1,AllowQuad=0)

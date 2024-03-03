@@ -6,14 +6,15 @@ Created on Wed Jun 18 16:12:15 2014
 """
 from __future__ import print_function
 
-import openmodes
-from openmodes.sources import PlaneWaveSource
-
 import os
 import os.path as osp
-import dill as pickle
 import tempfile
+
+import dill as pickle
 import numpy as np
+
+import openmodes
+from openmodes.sources import PlaneWaveSource
 
 
 def test_pickling_references():
@@ -25,8 +26,9 @@ def test_pickling_references():
         mesh_tol = 1e-3
 
         sim = openmodes.Simulation(name=name)
-        mesh = sim.load_mesh(osp.join(openmodes.geometry_dir, name+'.geo'),
-                             mesh_tol=mesh_tol)
+        mesh = sim.load_mesh(
+            osp.join(openmodes.geometry_dir, name + ".geo"), mesh_tol=mesh_tol
+        )
         parent_part = sim.place_part()
         sim.place_part(mesh, parent=parent_part)
         sim.place_part(mesh, parent=parent_part, location=[10, 10, 10])
@@ -36,7 +38,7 @@ def test_pickling_references():
         for part in sim.parts.iter_all():
             print("Original part", part)
             if part.parent_ref is None:
-                parents_dict[str(part.id)] = 'None'
+                parents_dict[str(part.id)] = "None"
             else:
                 parents_dict[str(part.id)] = str(part.parent_ref().id)
 
@@ -57,7 +59,7 @@ def test_pickling_references():
         for part in V.lookup[1][0].keys():
             print("Unpickled part", part)
             if part.parent_ref is None:
-                parents_dict[str(part.id)] = 'None'
+                parents_dict[str(part.id)] = "None"
             else:
                 parents_dict[str(part.id)] = str(part.parent_ref().id)
 
@@ -67,7 +69,7 @@ def test_pickling_references():
     loaded_parents_dict = load(file_name)
 
     # direct comparison of dictionaries seems to work
-    assert(original_parents_dict == loaded_parents_dict)
+    assert original_parents_dict == loaded_parents_dict
 
     print("original parent references", original_parents_dict)
     print("loaded parent references", loaded_parents_dict)
@@ -81,25 +83,27 @@ def test_empty_array():
     mesh_tol = 1e-3
 
     sim = openmodes.Simulation(name=name)
-    mesh = sim.load_mesh(osp.join(openmodes.geometry_dir, name+'.geo'),
-                         mesh_tol=mesh_tol)
+    mesh = sim.load_mesh(
+        osp.join(openmodes.geometry_dir, name + ".geo"), mesh_tol=mesh_tol
+    )
     part1 = sim.place_part(mesh)
     part2 = sim.place_part(mesh, location=[0, 0, 5e-3])
 
     vec = sim.empty_array()
 
-    s = 2j*np.pi*1e9
+    s = 2j * np.pi * 1e9
     Z = sim.impedance(s)
     pw = PlaneWaveSource([0, 1, 0], [0, 0, 1])
     V = sim.source_vector(pw, 0)
     I = Z.solve(V)
 
-    assert(vec.shape == I.shape)
-    assert(vec.lookup == I.lookup)
+    assert vec.shape == I.shape
+    assert vec.lookup == I.lookup
 
     vec2 = sim.empty_array(part2)
-    assert(vec2.shape == I[:, part2].shape)
-    assert(vec2.lookup == I[:, part2].lookup)
+    assert vec2.shape == I[:, part2].shape
+    assert vec2.lookup == I[:, part2].lookup
+
 
 if __name__ == "__main__":
     test_pickling_references()

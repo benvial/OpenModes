@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,9 +15,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Operator classes
 """
 
-from .mesh import TriangularSurfaceMesh, nodes_not_in_edge, shared_nodes, combine_mesh
+from .mesh import TriangularSurfaceMesh, combine_mesh, nodes_not_in_edge, shared_nodes

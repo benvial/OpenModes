@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,38 +15,40 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from __future__ import division
 
+import collections
+import logging
+import numbers
+import os.path as osp
+import shutil
+import sys
+import tempfile
+
 # numpy and scipy
 import numpy as np
-import os.path as osp
-import logging
-import tempfile
-import shutil
-import collections
-import numbers
-import sys
 
-from openmodes.mesh import gmsh
-from openmodes.integration import DunavantRule
-from openmodes.parts import SinglePart, CompositePart, MultiPart
-from openmodes.basis import LoopStarBasis, BasisContainer
-from openmodes.operator import EfieOperator
-from openmodes.visualise import plot_mayavi, write_vtk, preprocess
-from openmodes.mesh import TriangularSurfaceMesh
-from openmodes.helpers import Identified
-from openmodes.material import FreeSpace, PecMaterial
-from openmodes.modes import Modes
-from openmodes.multipole import spherical_multipoles, multipole_fixed
-from openmodes.constants import c
 from openmodes.array import LookupArray
+from openmodes.basis import BasisContainer, LoopStarBasis
+from openmodes.constants import c
+from openmodes.helpers import Identified
+from openmodes.integration import DunavantRule
+from openmodes.material import FreeSpace, PecMaterial
+from openmodes.mesh import TriangularSurfaceMesh, gmsh
+from openmodes.modes import Modes
+from openmodes.multipole import multipole_fixed, spherical_multipoles
+from openmodes.operator import EfieOperator
+from openmodes.parts import CompositePart, MultiPart, SinglePart
+from openmodes.visualise import plot_mayavi, preprocess, write_vtk
+
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:
     from collections.abc import Iterable
 else:
     from collections import Iterable
+
 
 class Simulation(Identified):
     """This object controls everything within the simluation. It contains all
@@ -54,14 +56,17 @@ class Simulation(Identified):
     used to solve the scattering problem.
     """
 
-    def __init__(self, integration_rule=DunavantRule(5),
-                 basis_class=LoopStarBasis,
-                 operator_class=EfieOperator,
-                 impedance_class=None,
-                 name=None,
-                 basis_args=dict(),
-                 background_material=FreeSpace,
-                 notebook=False):
+    def __init__(
+        self,
+        integration_rule=DunavantRule(5),
+        basis_class=LoopStarBasis,
+        operator_class=EfieOperator,
+        impedance_class=None,
+        name=None,
+        basis_args=dict(),
+        background_material=FreeSpace,
+        notebook=False,
+    ):
         """
         Parameters
         ----------
@@ -99,23 +104,26 @@ class Simulation(Identified):
         self.basis_class = basis_class
         self.background_material = background_material
         self.basis_container = BasisContainer(basis_class, basis_args)
-        self.operator = operator_class(integration_rule=integration_rule,
-                                       basis_container=self.basis_container,
-                                       background_material=background_material,
-                                       impedance_class=impedance_class)
+        self.operator = operator_class(
+            integration_rule=integration_rule,
+            basis_container=self.basis_container,
+            background_material=background_material,
+            impedance_class=impedance_class,
+        )
 
         self.multipole_cache = {}
         self.notebook = notebook
         if notebook:
             from openmodes.ipython import init_3d
+
             init_3d()
 
-        logging.info('Creating simulation %s\nQuadrature order %d\n'
-                     'Basis function class %s'
-                     % (name, integration_rule.order, basis_class))
+        logging.info(
+            "Creating simulation %s\nQuadrature order %d\n"
+            "Basis function class %s" % (name, integration_rule.order, basis_class)
+        )
 
-    def place_part(self, mesh=None, parent=None, location=None,
-                   material=PecMaterial):
+    def place_part(self, mesh=None, parent=None, location=None, material=PecMaterial):
         """Add a part to the simulation domain
 
         Parameters
@@ -180,17 +188,18 @@ class Simulation(Identified):
 
         if self.notebook:
             from .ipython import progress_iterator
+
             it = progress_iterator(freqs, description="Frequency Sweep")
-            logging.info(log_label+" started")
+            logging.info(log_label + " started")
             for freq_count, freq in enumerate(it):
-                yield freq_count, 2j*np.pi*freq
-            logging.info(log_label+" finished")
+                yield freq_count, 2j * np.pi * freq
+            logging.info(log_label + " finished")
         else:
             num_freqs = len(freqs)
             for freq_count, freq in enumerate(freqs):
                 if freq_count % log_skip == 0 and freq_count != 0:
-                    logging.info(log_label+" %d/%d" % (freq_count, num_freqs))
-                yield freq_count, 2j*np.pi*freq
+                    logging.info(log_label + " %d/%d" % (freq_count, num_freqs))
+                yield freq_count, 2j * np.pi * freq
 
     def impedance(self, s, parent=None):
         """Evaluate the self and mutual impedances of all parts in the
@@ -215,8 +224,7 @@ class Simulation(Identified):
         parent = parent or self.parts
         return self.operator.impedance(s, parent, parent)
 
-    def source_vector(self, source_field, s, parent=None,
-                      extinction_field=False):
+    def source_vector(self, source_field, s, parent=None, extinction_field=False):
         """Evaluate the source vectors due to an incident field, returning
         separate vectors for each part.
 
@@ -244,12 +252,18 @@ class Simulation(Identified):
         """
 
         parent = parent or self.parts
-        return self.operator.source_vector(source_field, s, parent,
-                                           extinction_field)
+        return self.operator.source_vector(source_field, s, parent, extinction_field)
 
-    def estimate_poles(self, contour, parts=None, threshold=1e-14,
-                       previous_result=None, cauchy_integral=True, modes=None,
-                       **kwargs):
+    def estimate_poles(
+        self,
+        contour,
+        parts=None,
+        threshold=1e-14,
+        previous_result=None,
+        cauchy_integral=True,
+        modes=None,
+        **kwargs
+    ):
         """Estimate the location of poles and their modes by Cauchy integration
         or a simpler quasi-static method
 
@@ -288,9 +302,15 @@ class Simulation(Identified):
                         previous = None
                     else:
                         previous = previous_result.modes_of_parts[part.unique_id]
-                    res[part.unique_id] = estimate(contour, part, threshold,
-                                                   previous, cauchy_integral,
-                                                   modes, iter_wrap=iter_wrap)
+                    res[part.unique_id] = estimate(
+                        contour,
+                        part,
+                        threshold,
+                        previous,
+                        cauchy_integral,
+                        modes,
+                        iter_wrap=iter_wrap,
+                    )
 
             # Find the parent part it it already exists, otherwise create a
             # MultiPart to hold the various parts
@@ -303,13 +323,20 @@ class Simulation(Identified):
             logging.info("Estimating poles of a single part")
             if previous_result is not None:
                 previous_result = previous_result.modes_of_parts[parts]
-            res = {parts.unique_id: estimate(contour, parts, threshold,
-                                             previous_result, cauchy_integral,
-                                             modes, iter_wrap=iter_wrap)}
+            res = {
+                parts.unique_id: estimate(
+                    contour,
+                    parts,
+                    threshold,
+                    previous_result,
+                    cauchy_integral,
+                    modes,
+                    iter_wrap=iter_wrap,
+                )
+            }
             parent_part = parts
             parts = [parts]
-           
-                                     
+
         return Modes(parent_part, parts, res, self.operator, self.basis_container)
 
     def refine_poles(self, estimates, rel_tol=1e-8, max_iter=40):
@@ -334,11 +361,17 @@ class Simulation(Identified):
         for part in estimates.parts:
             uid = part.unique_id
             if uid not in refined:
-                refined[uid] = self.operator.refine_poles(estimates.modes_of_parts[uid],
-                                                          part, rel_tol, max_iter, iter_wrap)
+                refined[uid] = self.operator.refine_poles(
+                    estimates.modes_of_parts[uid], part, rel_tol, max_iter, iter_wrap
+                )
 
-        return Modes(estimates.parent_part, estimates.parts, refined,
-                     self.operator, self.basis_container)
+        return Modes(
+            estimates.parent_part,
+            estimates.parts,
+            refined,
+            self.operator,
+            self.basis_container,
+        )
 
     def empty_array(self, part=None, extra_dims=()):
         """
@@ -356,11 +389,21 @@ class Simulation(Identified):
 
         part = part or self.parts
 
-        return LookupArray((self.operator.unknowns, (part, self.basis_container))+extra_dims, dtype=np.complex128)
+        return LookupArray(
+            (self.operator.unknowns, (part, self.basis_container)) + extra_dims,
+            dtype=np.complex128,
+        )
 
-    def plot_3d(self, solution=None, part=None, output_format='webgl',
-                filename=None, compress_scalars=None,
-                compress_separately=False, **kwargs):
+    def plot_3d(
+        self,
+        solution=None,
+        part=None,
+        output_format="webgl",
+        filename=None,
+        compress_scalars=None,
+        compress_separately=False,
+        **kwargs
+    ):
         """Plot a solution on several parts
 
         Parameters
@@ -399,7 +442,7 @@ class Simulation(Identified):
                     part = solution.lookup[0][2]
                     basis_container = solution.lookup[0][1]
 
-        if output_format == 'vtk':
+        if output_format == "vtk":
             write_vtk(part, filename, solution, basis_container)
             return
 
@@ -409,23 +452,36 @@ class Simulation(Identified):
             charges = currents = centres = None
         else:
             parts_list, charges, currents, centres = preprocess(
-                    part, solution, basis_container,
-                    compress_scalars, compress_separately)
+                part, solution, basis_container, compress_scalars, compress_separately
+            )
 
         output_format = output_format.lower()
-        if output_format == 'mayavi':
-            plot_mayavi(parts_list, charges, currents, vector_points=centres,
-                        compress_scalars=compress_scalars, filename=filename)
+        if output_format == "mayavi":
+            plot_mayavi(
+                parts_list,
+                charges,
+                currents,
+                vector_points=centres,
+                compress_scalars=compress_scalars,
+                filename=filename,
+            )
 
-        elif output_format == 'webgl':
+        elif output_format == "webgl":
             from openmodes.ipython import plot_3d
-            return plot_3d(parts_list, charges, currents, centres,
-                           **kwargs)
+
+            return plot_3d(parts_list, charges, currents, centres, **kwargs)
         else:
             raise ValueError("Unknown output format")
 
-    def load_mesh(self, filename, mesh_tol=None, force_tuple=False, scale=None,
-                  parameters={}, mesh_dir=None):
+    def load_mesh(
+        self,
+        filename,
+        mesh_tol=None,
+        force_tuple=False,
+        scale=None,
+        parameters={},
+        mesh_dir=None,
+    ):
         """
         Open a geometry file and mesh it (or directly open a mesh file), then
         convert it into a mesh object. Note that the mesh is _not_ added to
@@ -477,10 +533,13 @@ class Simulation(Identified):
                 mesh_dir = tempfile.mkdtemp()
                 delete_dir = True
 
-            logging.info("Meshing geometry %s with parameters %s in dir %s"
-                         % (filename, str(parameters), mesh_dir))
-            meshed_name = gmsh.mesh_geometry(filename, mesh_dir, mesh_tol,
-                                             parameters=parameters)
+            logging.info(
+                "Meshing geometry %s with parameters %s in dir %s"
+                % (filename, str(parameters), mesh_dir)
+            )
+            meshed_name = gmsh.mesh_geometry(
+                filename, mesh_dir, mesh_tol, parameters=parameters
+            )
 
         logging.info("Loading mesh %s" % meshed_name)
         raw_mesh = gmsh.read_mesh_meshio(meshed_name)
@@ -488,8 +547,9 @@ class Simulation(Identified):
         if delete_dir:
             shutil.rmtree(mesh_dir)
 
-        parts = tuple(TriangularSurfaceMesh(sub_mesh, scale=scale)
-                      for sub_mesh in raw_mesh)
+        parts = tuple(
+            TriangularSurfaceMesh(sub_mesh, scale=scale) for sub_mesh in raw_mesh
+        )
         if len(parts) == 1 and not force_tuple:
             return parts[0]
         else:
@@ -527,10 +587,10 @@ class Simulation(Identified):
         """
         container, parent_part = solution.lookup[1][1:]
 
-        a_e = np.zeros((order+1, 2*order+1), np.complex128)
+        a_e = np.zeros((order + 1, 2 * order + 1), np.complex128)
         a_m = np.zeros_like(a_e)
 
-        k = (s/c/1j)
+        k = s / c / 1j
         if np.isreal(k):
             # Suppress false warnings when dropping an imaginary part of 0
             k = k.real
@@ -538,13 +598,19 @@ class Simulation(Identified):
         for part in parent_part.iter_single():
             basis = self.basis_container[part]
 
-            points, current_J = basis.interpolate_function(solution["J", part].simple_view(),
-                                                           int_weight=True, integration_rule=self.integration_rule,
-                                                           nodes=part.nodes)
+            points, current_J = basis.interpolate_function(
+                solution["J", part].simple_view(),
+                int_weight=True,
+                integration_rule=self.integration_rule,
+                nodes=part.nodes,
+            )
             try:
-                points, current_M = basis.interpolate_function(solution["M", part].simple_view(),
-                                                               int_weight=True, integration_rule=self.integration_rule,
-                                                               nodes=part.nodes)
+                points, current_M = basis.interpolate_function(
+                    solution["M", part].simple_view(),
+                    int_weight=True,
+                    integration_rule=self.integration_rule,
+                    nodes=part.nodes,
+                )
             except KeyError:
                 current_M = np.zeros_like(current_J)
 
@@ -558,10 +624,15 @@ class Simulation(Identified):
                 fixed_terms = multipole_fixed(order, points)
                 self.multipole_cache[cache_key] = fixed_terms
 
-            n_e, n_m = spherical_multipoles(order, k, points, current_J,
-                                            1j*current_M,
-                                            self.background_material.eta(s),
-                                            fixed_terms)
+            n_e, n_m = spherical_multipoles(
+                order,
+                k,
+                points,
+                current_J,
+                1j * current_M,
+                self.background_material.eta(s),
+                fixed_terms,
+            )
             a_e += n_e
             a_m += n_m
 
@@ -571,6 +642,7 @@ class Simulation(Identified):
         "Generate a wrapper iterator if using the notebook"
         if self.notebook:
             from .ipython import progress_iterator
+
             return lambda x: progress_iterator(x, description=description)
         else:
             return lambda x: x

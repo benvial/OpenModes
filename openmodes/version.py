@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """This file contains the version number of OpenModes. It will be called by
 setup.py before installing, generating source package etc.
@@ -29,8 +29,8 @@ before tagging each release
 Based on public domain code from Douglas Creager
 """
 
-from subprocess import Popen, PIPE
 import os.path as osp
+from subprocess import PIPE, Popen
 
 # THIS MUST BE UPDATED MANUALLY FOR NON-GIT
 RELEASE_VERSION = "1.3.2"
@@ -38,13 +38,21 @@ RELEASE_VERSION = "1.3.2"
 
 def version_git():
     try:
-        openmodes_path = osp.normpath(osp.join(osp.dirname(osp.realpath(__file__)), ".."))
-        p = Popen(['git', 'describe', '--abbrev=%d' % 4], stdout=PIPE,
-                  stderr=PIPE, universal_newlines=True, cwd=openmodes_path)
+        openmodes_path = osp.normpath(
+            osp.join(osp.dirname(osp.realpath(__file__)), "..")
+        )
+        p = Popen(
+            ["git", "describe", "--abbrev=%d" % 4],
+            stdout=PIPE,
+            stderr=PIPE,
+            universal_newlines=True,
+            cwd=openmodes_path,
+        )
         p.stderr.close()
         line = p.stdout.readlines()[0]
         return line.strip()
     except:
         return None
+
 
 __version__ = version_git() or RELEASE_VERSION
