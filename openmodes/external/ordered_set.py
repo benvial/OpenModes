@@ -15,7 +15,6 @@ Rob Speer's changes are as follows:
     - added __getitem__
 """
 
-import collections
 import sys
 
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:

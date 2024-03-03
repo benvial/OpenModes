@@ -347,7 +347,7 @@ def read_mesh_meshio(filename):
             raise NotImplementedError('Multiple physical objects in one mesh not yet implemented')
 
     # eliminate points which are not part of the object
-    # mesh.prune() 
+    mesh.remove_orphaned_nodes() 
 
     return [{'nodes': mesh.points, 'triangles': mesh.cells_dict['triangle']}]
 

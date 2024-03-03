@@ -23,9 +23,14 @@ from __future__ import division
 import numpy as np
 from openmodes.parts import Part
 import numbers
-import collections
 import six
 import warnings
+import sys
+
+if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+    from collections.abc import Iterable
+else:
+    from collections import Iterable
 
 
 def part_ranges_lowest(parent_part, basis_container):
@@ -91,7 +96,7 @@ def build_lookup(index_data):
     lookup = []
     shape = []
     for index in index_data:
-        if isinstance(index, collections.Iterable) and isinstance(index[0], Part):
+        if isinstance(index, Iterable) and isinstance(index[0], Part):
             # a hierarchy of parts
             basis_container = index[1]
             part = index[0]
@@ -250,9 +255,9 @@ class LookupArray(np.ndarray):
                     elif isinstance(entry, slice) and entry == slice(None):
                         # If slicing the whole dimension, metadata can be kept
                         sub_lookup.append(self.lookup[entry_num])
-                    elif isinstance(entry, collections.Iterable):
+                    elif isinstance(entry, Iterable):
                         # TODO: find a better solution to avoid this probelm
-                        # warnings.warn("Indexing LookupArray with iterable is unreliable")
+                        warnings.warn("Indexing LookupArray with iterable is unreliable")
                         pass
                     else:
                         # In all other cases metadata is lost

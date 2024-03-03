@@ -28,6 +28,7 @@ import tempfile
 import shutil
 import collections
 import numbers
+import sys
 
 from openmodes.mesh import gmsh
 from openmodes.integration import DunavantRule
@@ -42,7 +43,10 @@ from openmodes.modes import Modes
 from openmodes.multipole import spherical_multipoles, multipole_fixed
 from openmodes.constants import c
 from openmodes.array import LookupArray
-
+if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+    from collections.abc import Iterable
+else:
+    from collections import Iterable
 
 class Simulation(Identified):
     """This object controls everything within the simluation. It contains all
@@ -273,7 +277,7 @@ class Simulation(Identified):
         iter_wrap = self.__iter_wrap("Contour Integration")
         estimate = self.operator.estimate_poles
 
-        if isinstance(parts, collections.Iterable):
+        if isinstance(parts, Iterable):
             # a list of parts was given
             logging.info("Estimating poles of multiple parts")
             res = {}
