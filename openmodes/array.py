@@ -257,7 +257,7 @@ class LookupArray(np.ndarray):
                         sub_lookup.append(self.lookup[entry_num])
                     elif isinstance(entry, Iterable):
                         # TODO: find a better solution to avoid this probelm
-                        warnings.warn("Indexing LookupArray with iterable is unreliable")
+                        # warnings.warn("Indexing LookupArray with iterable is unreliable")
                         pass
                     else:
                         # In all other cases metadata is lost

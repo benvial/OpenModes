@@ -24,8 +24,14 @@ from openmodes.simulation import Simulation
 from openmodes.version import __version__
 
 # allow the user to find the provided geometry files
-from pkg_resources import resource_filename
-geometry_dir = resource_filename('openmodes', 'geometry')
+import sys
+
+if sys.version_info >= (3, 9):
+    import importlib.resources as importlib_resources
+else:
+    import importlib_resources
+
+geometry_dir = importlib_resources.files('openmodes') / 'geometry'
 
 # setup jinja template location
 from jinja2 import Environment, PackageLoader

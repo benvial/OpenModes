@@ -73,8 +73,8 @@ def test_list_indexing():
                       ('modes',), (srr2, sim.basis_container)),
                      dtype=np.complex128)
 
-    with pytest.warns(UserWarning):
-        res[0, :, 0, [2]]
+    # with pytest.warns(UserWarning):
+    #     res[0, :, 0, [2]]
 
 
 if __name__ == "__main__":

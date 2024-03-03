@@ -199,7 +199,7 @@ class Contour(object):
         "Check each point to see whether it lies within the contour"
         vertices = np.array([x for x, w in self])
         vertices = np.hstack((vertices.real[:, None], vertices.imag[:, None]))
-        inside = np.empty(np.product(points.shape), dtype=np.bool)
+        inside = np.empty(np.product(points.shape), dtype=bool)
 
         for point_num, point in enumerate(points.flat):
             inside[point_num] = wn_PnPoly((point.real, point.imag), vertices)

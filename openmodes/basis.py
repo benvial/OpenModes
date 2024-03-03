@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Routines to construct the basis functions on a mesh
 """
@@ -26,15 +26,21 @@ from scipy.sparse import lil_matrix
 import numpy as np
 
 from openmodes.mesh import nodes_not_in_edge, shared_nodes
-from openmodes.helpers import (cached_property, inc_slice, Identified, memoize,
-                               equivalence, MeshError)
+from openmodes.helpers import (
+    cached_property,
+    inc_slice,
+    Identified,
+    memoize,
+    equivalence,
+    MeshError,
+)
 from openmodes.integration import triangle_centres
 from openmodes.external.ordered_set import OrderedSet
 from openmodes.parts import Part
 
 # A named tuple for holding the positive and negative triangles and nodes
 # which are used by both RWG and loop-star basis functions
-RWG = namedtuple('RWG', ('tri_p', 'tri_m', 'node_p', 'node_m'))
+RWG = namedtuple("RWG", ("tri_p", "tri_m", "node_p", "node_m"))
 
 
 def inner_product_triangle_face(nodes):
@@ -44,15 +50,37 @@ def inner_product_triangle_face(nodes):
     n0, n1, n2 = nodes
     res = np.empty((3, 3), np.float64)
 
-    res[0, 0] = np.sum(n0**2/4 - n0*n1/4 - n0*n2/4 + n1**2/12 + n1*n2/12 + n2**2/12)
-    res[0, 1] = np.sum(-n0**2/12 + n0*n1/4 - n0*n2/12 - n1**2/12 - n1*n2/12 + n2**2/12)
-    res[0, 2] = np.sum(-n0**2/12 - n0*n1/12 + n0*n2/4 + n1**2/12 - n1*n2/12 - n2**2/12)
+    res[0, 0] = np.sum(
+        n0**2 / 4 - n0 * n1 / 4 - n0 * n2 / 4 + n1**2 / 12 + n1 * n2 / 12 + n2**2 / 12
+    )
+    res[0, 1] = np.sum(
+        -(n0**2) / 12
+        + n0 * n1 / 4
+        - n0 * n2 / 12
+        - n1**2 / 12
+        - n1 * n2 / 12
+        + n2**2 / 12
+    )
+    res[0, 2] = np.sum(
+        -(n0**2) / 12
+        - n0 * n1 / 12
+        + n0 * n2 / 4
+        + n1**2 / 12
+        - n1 * n2 / 12
+        - n2**2 / 12
+    )
     res[1, 0] = res[0, 1]
-    res[1, 1] = np.sum(n0**2/12 - n0*n1/4 + n0*n2/12 + n1**2/4 - n1*n2/4 + n2**2/12)
-    res[1, 2] = np.sum(n0**2/12 - n0*n1/12 - n0*n2/12 - n1**2/12 + n1*n2/4 - n2**2/12)
+    res[1, 1] = np.sum(
+        n0**2 / 12 - n0 * n1 / 4 + n0 * n2 / 12 + n1**2 / 4 - n1 * n2 / 4 + n2**2 / 12
+    )
+    res[1, 2] = np.sum(
+        n0**2 / 12 - n0 * n1 / 12 - n0 * n2 / 12 - n1**2 / 12 + n1 * n2 / 4 - n2**2 / 12
+    )
     res[2, 0] = res[0, 2]
     res[2, 1] = res[1, 2]
-    res[2, 2] = np.sum(n0**2/12 + n0*n1/12 - n0*n2/4 + n1**2/12 - n1*n2/4 + n2**2/4)
+    res[2, 2] = np.sum(
+        n0**2 / 12 + n0 * n1 / 12 - n0 * n2 / 4 + n1**2 / 12 - n1 * n2 / 4 + n2**2 / 4
+    )
 
     return res
 
@@ -78,10 +106,15 @@ class LinearTriangleBasis(AbstractBasis):
     def unique_key(cls, part, args):
         return (cls, part.mesh.id, frozenset(args.items()))
 
-    def interpolate_function(self, linear_func,
-                             integration_rule=triangle_centres,
-                             flatten=True, return_scalar=False, nodes=None,
-                             int_weight=False):
+    def interpolate_function(
+        self,
+        linear_func,
+        integration_rule=triangle_centres,
+        flatten=True,
+        return_scalar=False,
+        nodes=None,
+        int_weight=False,
+    ):
         """Interpolate a function defined in RWG or loop-star basis over the
         complete mesh
 
@@ -117,15 +150,14 @@ class LinearTriangleBasis(AbstractBasis):
         tri_func = tri_func.reshape((num_tri, 3))  # num tri, node number
 
         if not int_weight:
-            tri_func /= 2*self.mesh.polygon_areas[:, None]
+            tri_func /= 2 * self.mesh.polygon_areas[:, None]
 
         if nodes is None:
             nodes = self.mesh.nodes
         points_per_tri = len(integration_rule)
 
         xi_eta = integration_rule.points
-        xi_eta_zeta = np.hstack((xi_eta,
-                                1.0 - xi_eta[:, :1] - xi_eta[:, 1:2]))
+        xi_eta_zeta = np.hstack((xi_eta, 1.0 - xi_eta[:, :1] - xi_eta[:, 1:2]))
 
         if int_weight:
             weights = integration_rule.weights  # points per tri
@@ -135,22 +167,23 @@ class LinearTriangleBasis(AbstractBasis):
 
         # Expand to num tri, points per tri, node number, x/y/z
         # Final array is num tri, points per tri, x/y/z
-        r = np.sum(tri_nodes[:, None]*xi_eta_zeta[None, :, :, None], axis=2)
+        r = np.sum(tri_nodes[:, None] * xi_eta_zeta[None, :, :, None], axis=2)
 
         # num tri, points per tri, num nodes
-        scalar_func = np.sum(tri_func[:, None, :]*weights[None, :, None], axis=2)
+        scalar_func = np.sum(tri_func[:, None, :] * weights[None, :, None], axis=2)
 
         # num tri, points per tri, nodes per tri, x/y/z
         rho = r[:, :, None] - tri_nodes[:, None]
 
         # Expand as rho, reduce to num tri, points per tri, x/y/z
-        vector_func = np.sum(rho*tri_func[:, None, :, None] *
-                             weights[None, :, None, None], axis=2)
+        vector_func = np.sum(
+            rho * tri_func[:, None, :, None] * weights[None, :, None, None], axis=2
+        )
 
         if flatten:
-            r = r.reshape((num_tri*points_per_tri, 3))
-            vector_func = vector_func.reshape((num_tri*points_per_tri, 3))
-            scalar_func = scalar_func.reshape((num_tri*points_per_tri,))
+            r = r.reshape((num_tri * points_per_tri, 3))
+            vector_func = vector_func.reshape((num_tri * points_per_tri, 3))
+            scalar_func = scalar_func.reshape((num_tri * points_per_tri,))
 
         if return_scalar:
             return r, vector_func, scalar_func
@@ -178,22 +211,29 @@ class LinearTriangleBasis(AbstractBasis):
             functions defined on each triangle
         """
 
-        r = np.empty((len(self.mesh.polygons), len(integration_rule), 3),
-                     self.mesh.nodes.dtype)
-        rho = np.empty((len(self.mesh.polygons), 3, len(integration_rule), 3),
-                       self.mesh.nodes.dtype)
+        r = np.empty(
+            (len(self.mesh.polygons), len(integration_rule), 3), self.mesh.nodes.dtype
+        )
+        rho = np.empty(
+            (len(self.mesh.polygons), 3, len(integration_rule), 3),
+            self.mesh.nodes.dtype,
+        )
 
         for tri_count, node_nums in enumerate(self.mesh.polygons):
             for point_count, (xi, eta) in enumerate(integration_rule.points):
                 zeta = 1.0 - eta - xi
 
-                r[tri_count, point_count] = (xi*nodes[node_nums[0]] +
-                                             eta*nodes[node_nums[1]] +
-                                             zeta*nodes[node_nums[2]])
+                r[tri_count, point_count] = (
+                    xi * nodes[node_nums[0]]
+                    + eta * nodes[node_nums[1]]
+                    + zeta * nodes[node_nums[2]]
+                )
 
                 for node_count in range(3):
                     # Vector rho within the observer triangle
-                    rho[tri_count, node_count, point_count] = r[tri_count, point_count] - nodes[node_nums][node_count]
+                    rho[tri_count, node_count, point_count] = (
+                        r[tri_count, point_count] - nodes[node_nums][node_count]
+                    )
 
         return r, rho
 
@@ -226,9 +266,8 @@ class LinearTriangleBasis(AbstractBasis):
         r, rho = self.integration_points(nodes, integration_rule)
         func_points = func(r)  # dim[num_tri, num_points, 3]
         if n_cross:
-            func_points = np.cross(self.mesh.surface_normals[:, None, :],
-                                   func_points)
-        func_rho = np.sum(func_points[:, None, :, :]*rho, axis=3)
+            func_points = np.cross(self.mesh.surface_normals[:, None, :], func_points)
+        func_rho = np.sum(func_points[:, None, :, :] * rho, axis=3)
         # func_rho has dim[num_tri, 3, num_points]
         func_tri = np.dot(func_rho, integration_rule.weights)  # dim[num_tri, 3]
         vector_transform, _ = self.transformation_matrices
@@ -247,15 +286,20 @@ class LinearTriangleBasis(AbstractBasis):
         """
         num_tri = len(self.mesh.polygons)
         G = np.zeros((num_tri, 3, num_tri, 3), dtype=np.float64)
-        for tri_count, (tri, area) in enumerate(zip(self.mesh.polygons,
-                                                    self.mesh.polygon_areas)):
+        for tri_count, (tri, area) in enumerate(
+            zip(self.mesh.polygons, self.mesh.polygon_areas)
+        ):
             nodes = self.mesh.nodes[tri]
-            G[tri_count, :, tri_count, :] = inner_product_triangle_face(nodes)/(2*area)
+            G[tri_count, :, tri_count, :] = inner_product_triangle_face(nodes) / (
+                2 * area
+            )
             # factor of 1/(2*area) is for second integration
 
         # convert from faces to the appropriate basis functions
         vector_transform, _ = self.transformation_matrices
-        return vector_transform.dot(vector_transform.dot(G.reshape(3*num_tri, 3*num_tri)).T).T
+        return vector_transform.dot(
+            vector_transform.dot(G.reshape(3 * num_tri, 3 * num_tri)).T
+        ).T
 
 
 class DivRwgBasis(LinearTriangleBasis):
@@ -281,8 +325,10 @@ class DivRwgBasis(LinearTriangleBasis):
         sharing_count = np.array([len(n) for n in triangles_shared_by_edges])
 
         if min(sharing_count) < 1 or max(sharing_count) > 2:
-            raise ValueError("Mesh edges must be part of exactly 1 or 2" +
-                             "triangles for RWG basis functions")
+            raise ValueError(
+                "Mesh edges must be part of exactly 1 or 2"
+                + "triangles for RWG basis functions"
+            )
 
         shared_edge_indices = np.where(sharing_count == 2)[0]
 
@@ -304,15 +350,19 @@ class DivRwgBasis(LinearTriangleBasis):
             # determine the indices of the unshared nodes, indexed within the
             # sharing triangles (i.e. 0, 1 or 2)
             node_p[basis_count] = nodes_not_in_edge(
-                       mesh.polygons[tri_p[basis_count]], edges[edge_count])[0]
+                mesh.polygons[tri_p[basis_count]], edges[edge_count]
+            )[0]
             node_m[basis_count] = nodes_not_in_edge(
-                       mesh.polygons[tri_m[basis_count]], edges[edge_count])[0]
+                mesh.polygons[tri_m[basis_count]], edges[edge_count]
+            )[0]
 
         self.rwg = RWG(tri_p, tri_m, node_p, node_m)
         self.sections = (num_basis,)
 
-        logging.info("Constructing %d RWG basis functions over %d faces"
-                     % (num_basis, len(mesh.polygons)))
+        logging.info(
+            "Constructing %d RWG basis functions over %d faces"
+            % (num_basis, len(mesh.polygons))
+        )
 
     @cached_property
     def transformation_matrices(self):
@@ -331,14 +381,14 @@ class DivRwgBasis(LinearTriangleBasis):
         # scalar_transform = np.zeros((num_basis, num_tri), np.float64)
         # vector_transform=np.zeros((num_basis, 3*num_tri), np.float64)
         scalar_transform = lil_matrix((num_basis, num_tri))
-        vector_transform = lil_matrix((num_basis, 3*num_tri))
+        vector_transform = lil_matrix((num_basis, 3 * num_tri))
 
         for basis_count, (tri_p, tri_m, node_p, node_m) in enumerate(self):
             scalar_transform[basis_count, tri_p] = 1.0
             scalar_transform[basis_count, tri_m] = -1.0
 
-            vector_transform[basis_count, tri_p*3+node_p] = 1.0
-            vector_transform[basis_count, tri_m*3+node_m] = -1.0
+            vector_transform[basis_count, tri_p * 3 + node_p] = 1.0
+            vector_transform[basis_count, tri_m * 3 + node_m] = -1.0
 
         return vector_transform.tocsr(), scalar_transform.tocsr()
 
@@ -346,8 +396,12 @@ class DivRwgBasis(LinearTriangleBasis):
         return len(self.rwg.tri_p)
 
     def __getitem__(self, index):
-        return RWG(self.rwg.tri_p[index], self.rwg.tri_m[index],
-                   self.rwg.node_p[index], self.rwg.node_m[index])
+        return RWG(
+            self.rwg.tri_p[index],
+            self.rwg.tri_m[index],
+            self.rwg.node_p[index],
+            self.rwg.node_m[index],
+        )
 
 
 def construct_stars(mesh, edges, triangles_shared_by_edges, sharing_count):
@@ -374,10 +428,8 @@ def construct_stars(mesh, edges, triangles_shared_by_edges, sharing_count):
         tri_m[tri1].append(tri2)
         tri_m[tri2].append(tri1)
 
-        node1 = nodes_not_in_edge(mesh.polygons[tri1],
-                                  edges[edge_count])[0]
-        node2 = nodes_not_in_edge(mesh.polygons[tri2],
-                                  edges[edge_count])[0]
+        node1 = nodes_not_in_edge(mesh.polygons[tri1], edges[edge_count])[0]
+        node2 = nodes_not_in_edge(mesh.polygons[tri2], edges[edge_count])[0]
         node_p[tri1].append(node1)
         node_p[tri2].append(node2)
 
@@ -403,8 +455,7 @@ def construct_loop(loop_triangles, polygons):
 
     while len(loop_triangles) > 0:
         for triangle_count, next_triangle in enumerate(loop_triangles):
-            shared = shared_nodes(polygons[next_triangle],
-                                  polygons[current_triangle])
+            shared = shared_nodes(polygons[next_triangle], polygons[current_triangle])
             if len(shared) == 2:
                 break
         loop_triangles.pop(triangle_count)
@@ -419,7 +470,7 @@ def construct_loop(loop_triangles, polygons):
         node_p.append(free_current)
         node_m.append(free_next)
 
-        #done_triangles.append(current_triangle)
+        # done_triangles.append(current_triangle)
         current_triangle = next_triangle
 
     # now connect the loop with the first and last triangle
@@ -465,11 +516,14 @@ class LoopStarBasis(LinearTriangleBasis):
         sharing_count = np.array([len(n) for n in triangles_shared_by_edges])
 
         if min(sharing_count) < 1 or max(sharing_count) > 2:
-            raise ValueError("Mesh edges must be part of exactly 1 or 2" +
-                             "triangles for loop-star basis functions")
+            raise ValueError(
+                "Mesh edges must be part of exactly 1 or 2"
+                + "triangles for loop-star basis functions"
+            )
 
-        self.rwg_star = construct_stars(mesh, edges, triangles_shared_by_edges,
-                                        sharing_count)
+        self.rwg_star = construct_stars(
+            mesh, edges, triangles_shared_by_edges, sharing_count
+        )
 
         # Now start searching for loops
         num_nodes = len(mesh.nodes)
@@ -488,6 +542,7 @@ class LoopStarBasis(LinearTriangleBasis):
         inner_nodes = OrderedSet(range(num_nodes)) - outer_nodes
 
         triangles_sharing_nodes = mesh.triangles_sharing_nodes()
+        # triangles_sharing_nodes.pop(0)
 
         # Note that this would create one basis function for each inner
         # node which may exceed the number of RWG degrees of freedom. In
@@ -510,22 +565,26 @@ class LoopStarBasis(LinearTriangleBasis):
 
                 # find all the triangles sharing this node
                 loop_triangles = list(triangles_sharing_nodes[node_number])
+                if loop_triangles != []:
 
-                this_loop = construct_loop(loop_triangles, mesh.polygons)
-                loop_tri_p.append(this_loop[0])
-                loop_tri_m.append(this_loop[1])
-                loop_node_p.append(this_loop[2])
-                loop_node_m.append(this_loop[3])
+                    this_loop = construct_loop(loop_triangles, mesh.polygons)
+                    loop_tri_p.append(this_loop[0])
+                    loop_tri_m.append(this_loop[1])
+                    loop_node_p.append(this_loop[2])
+                    loop_node_m.append(this_loop[3])
 
         node_sets = equivalence(unshared_edges)
         boundaries = len(node_sets)
         euler = len(mesh.nodes) - len(edges) + len(mesh.polygons)
-        genus = 1 - 0.5*(boundaries+euler)
-        logging.info("Mesh has {} Boundaries, {} Euler number, {} Genus"
-                     .format(boundaries, euler, genus))
+        genus = 1 - 0.5 * (boundaries + euler)
+        logging.info(
+            "Mesh has {} Boundaries, {} Euler number, {} Genus".format(
+                boundaries, euler, genus
+            )
+        )
         if num_loops > len(inner_nodes):
             # The structure has internal holes, so additional loops are needed
-            needed_loops = num_loops-len(inner_nodes)
+            needed_loops = num_loops - len(inner_nodes)
 
             if boundaries < needed_loops:
                 raise MeshError("Unable to find a full set of loops")
@@ -549,16 +608,24 @@ class LoopStarBasis(LinearTriangleBasis):
 
         self.sections = (num_loops, self.num_stars)
 
-        logging.info("Constructing %d loop-star basis functions\n"
-                     "%d loops\n%d stars\n%d faces\n%d edges\n"
-                     "%d unshared_edges\n"
-                     "%d nodes on boundary"
-                     % (len(self), num_loops, self.num_stars,
-                        len(mesh.polygons), len(edges), len(unshared_edges),
-                        len(outer_nodes)))
+        logging.info(
+            "Constructing %d loop-star basis functions\n"
+            "%d loops\n%d stars\n%d faces\n%d edges\n"
+            "%d unshared_edges\n"
+            "%d nodes on boundary"
+            % (
+                len(self),
+                num_loops,
+                self.num_stars,
+                len(mesh.polygons),
+                len(edges),
+                len(unshared_edges),
+                len(outer_nodes),
+            )
+        )
 
     def __len__(self):
-        return len(self.rwg_loop.tri_p)+len(self.rwg_star.tri_p)
+        return len(self.rwg_loop.tri_p) + len(self.rwg_star.tri_p)
 
     @property
     def num_loops(self):
@@ -588,11 +655,19 @@ class LoopStarBasis(LinearTriangleBasis):
 
         if index >= self.num_loops:
             index -= self.num_loops
-            return RWG(self.rwg_star.tri_p[index], self.rwg_star.tri_m[index],
-                    self.rwg_star.node_p[index], self.rwg_star.node_m[index])
+            return RWG(
+                self.rwg_star.tri_p[index],
+                self.rwg_star.tri_m[index],
+                self.rwg_star.node_p[index],
+                self.rwg_star.node_m[index],
+            )
         else:
-            return RWG(self.rwg_loop.tri_p[index], self.rwg_loop.tri_m[index],
-                    self.rwg_loop.node_p[index], self.rwg_loop.node_m[index])
+            return RWG(
+                self.rwg_loop.tri_p[index],
+                self.rwg_loop.tri_m[index],
+                self.rwg_loop.node_p[index],
+                self.rwg_loop.node_m[index],
+            )
 
     @property
     def rwg(self):
@@ -618,7 +693,7 @@ class LoopStarBasis(LinearTriangleBasis):
         # vector_transform = np.zeros((num_basis, 3*num_tri), np.float64)
 
         scalar_transform = lil_matrix((num_basis, num_tri))
-        vector_transform = lil_matrix((num_basis, 3*num_tri))
+        vector_transform = lil_matrix((num_basis, 3 * num_tri))
 
         for basis_count, (tri_p, tri_m, node_p, node_m) in enumerate(self):
             # Assume that tri_p, tri_m, node_p, node_m are all of same
@@ -630,10 +705,10 @@ class LoopStarBasis(LinearTriangleBasis):
                     scalar_transform[basis_count, tri_n] += -1.0
 
             for tri_n, node_n in zip(tri_p, node_p):
-                vector_transform[basis_count, tri_n*3+node_n] += 1.0
+                vector_transform[basis_count, tri_n * 3 + node_n] += 1.0
 
             for tri_n, node_n in zip(tri_m, node_m):
-                vector_transform[basis_count, tri_n*3+node_n] += -1.0
+                vector_transform[basis_count, tri_n * 3 + node_n] += -1.0
 
         return vector_transform.tocsr(), scalar_transform.tocsr()
 
@@ -651,9 +726,9 @@ class MacroBasis(AbstractBasis):
         """
         super(MacroBasis, self).__init__()
         self.part = part
-        modes = kwargs['modes_of_parts'][part.unique_id]
-        self.vr = modes['vr']
-        self.vl = modes['vl']
+        modes = kwargs["modes_of_parts"][part.unique_id]
+        self.vr = modes["vr"]
+        self.vl = modes["vl"]
 
     @classmethod
     def unique_key(cls, part, args):
@@ -706,8 +781,7 @@ class BasisContainer(object):
         except KeyError:
             all_args = args.copy()
             all_args.update(self.global_args)
-            logging.debug("Constructing basis functions with key %s "
-                          % str(unique_key))
+            logging.debug("Constructing basis functions with key %s " % str(unique_key))
             result = self.basis_class(part, **all_args)
             self.cached_basis[unique_key] = result
             return result

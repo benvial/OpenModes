@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  OpenModes - An eigenmode solver for open electromagnetic resonantors
 #  Copyright (C) 2013 David Powell
 #
@@ -15,7 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Routines and classes for storing a mesh, and querying it to calculate
 derived quantities
@@ -44,8 +44,9 @@ def nodes_not_in_edge(nodes, edge):
     non_member_nodes : list
         The nodes which are not a member of the given edge
     """
-    return [node_index for node_index, node_num in enumerate(nodes)
-            if node_num not in edge]
+    return [
+        node_index for node_index, node_num in enumerate(nodes) if node_num not in edge
+    ]
 
 
 def shared_nodes(nodes1, nodes2):
@@ -85,7 +86,7 @@ class TriangularSurfaceMesh(Identified):
 
     """
 
-    polygon_name = 'triangles'
+    polygon_name = "triangles"
 
     def __init__(self, raw_mesh, scale=None):
         """
@@ -107,7 +108,7 @@ class TriangularSurfaceMesh(Identified):
 
         super(TriangularSurfaceMesh, self).__init__()
 
-        self.nodes = np.asfortranarray(raw_mesh['nodes'])
+        self.nodes = np.asfortranarray(raw_mesh["nodes"])
         if scale is not None:
             self.nodes *= scale
 
@@ -116,15 +117,17 @@ class TriangularSurfaceMesh(Identified):
         self.polygons.setflags(write=False)
 
         try:
-            self.physical_name = raw_mesh['physical_name']
+            self.physical_name = raw_mesh["physical_name"]
         except KeyError:
             self.physical_name = None
 
-        logging.info('Creating triangular mesh\n%d nodes\n%d triangles' %
-                     (len(self.nodes), len(self.polygons)))
+        logging.info(
+            "Creating triangular mesh\n%d nodes\n%d triangles"
+            % (len(self.nodes), len(self.polygons))
+        )
 
-#    def __repr__(self):
-#        return "Nodes
+    #    def __repr__(self):
+    #        return "Nodes
 
     # TODO: memoize these lookup methods?
 
@@ -152,9 +155,11 @@ class TriangularSurfaceMesh(Identified):
         for count, t_nodes in enumerate(self.polygons):
 
             # edges are represented as sets to avoid ambiguity of order
-            triangle_edges = [frozenset((t_nodes[0], t_nodes[1])),
-                              frozenset((t_nodes[0], t_nodes[2])),
-                              frozenset((t_nodes[1], t_nodes[2]))]
+            triangle_edges = [
+                frozenset((t_nodes[0], t_nodes[1])),
+                frozenset((t_nodes[0], t_nodes[2])),
+                frozenset((t_nodes[1], t_nodes[2])),
+            ]
 
             for edge in triangle_edges:
                 if edge in all_edges:
@@ -184,7 +189,6 @@ class TriangularSurfaceMesh(Identified):
             # tell each node that it is a part of this triangle
             for node in t_nodes:
                 polygons[node].add(count)
-
         return polygons
 
     @property
@@ -195,13 +199,14 @@ class TriangularSurfaceMesh(Identified):
     @property
     def max_distance(self):
         """The furthest distance between any two nodes in this mesh"""
-        return np.sqrt(np.sum((self.nodes[:, None, :] -
-                       self.nodes[None, :, :])**2, axis=2)).max()
+        return np.sqrt(
+            np.sum((self.nodes[:, None, :] - self.nodes[None, :, :]) ** 2, axis=2)
+        ).max()
 
     def fast_size(self):
         """A fast estimate of the size of the mesh, based on the maximum
         distance along any of the three cartesian axes"""
-        return max(np.max(self.nodes, axis=0)-np.min(self.nodes, axis=0))
+        return max(np.max(self.nodes, axis=0) - np.min(self.nodes, axis=0))
 
     @property
     def polygon_areas(self):
@@ -211,9 +216,9 @@ class TriangularSurfaceMesh(Identified):
         # calculate all the edges in the mesh
         for count, t_nodes in enumerate(self.polygons):
             # calculate the area of each triangle
-            vec1 = self.nodes[t_nodes[1]]-self.nodes[t_nodes[0]]
-            vec2 = self.nodes[t_nodes[2]]-self.nodes[t_nodes[0]]
-            areas[count] = 0.5*np.sqrt(sum(np.cross(vec1, vec2)**2))
+            vec1 = self.nodes[t_nodes[1]] - self.nodes[t_nodes[0]]
+            vec2 = self.nodes[t_nodes[2]] - self.nodes[t_nodes[0]]
+            areas[count] = 0.5 * np.sqrt(sum(np.cross(vec1, vec2) ** 2))
 
         return areas
 
@@ -224,10 +229,10 @@ class TriangularSurfaceMesh(Identified):
 
         # calculate all the edges in the mesh
         for count, t_nodes in enumerate(self.polygons):
-            vec1 = self.nodes[t_nodes[1]]-self.nodes[t_nodes[0]]
-            vec2 = self.nodes[t_nodes[2]]-self.nodes[t_nodes[0]]
+            vec1 = self.nodes[t_nodes[1]] - self.nodes[t_nodes[0]]
+            vec2 = self.nodes[t_nodes[2]] - self.nodes[t_nodes[0]]
             normal = np.cross(vec1, vec2)
-            normals[count] = normal/np.sqrt(np.dot(normal, normal))
+            normals[count] = normal / np.sqrt(np.dot(normal, normal))
 
         return normals
 
@@ -238,8 +243,12 @@ class TriangularSurfaceMesh(Identified):
         vertices = self.nodes[self.polygons]
 
         # each edge is numbered according to its opposite node
-        return np.sqrt(np.sum((np.roll(vertices, 1, axis=1) -
-                       np.roll(vertices, 2, axis=1))**2, axis=2))
+        return np.sqrt(
+            np.sum(
+                (np.roll(vertices, 1, axis=1) - np.roll(vertices, 2, axis=1)) ** 2,
+                axis=2,
+            )
+        )
 
     @cached_property
     def closed_surface(self):
@@ -269,10 +278,12 @@ def combine_mesh(meshes, nodes=None):
         if type(mesh) != mesh_class:
             raise TypeError("Cannot combine meshes of different types")
         all_nodes.append(current_nodes)
-        all_polygons.append(mesh.polygons+node_offset)
+        all_polygons.append(mesh.polygons + node_offset)
         node_offset += len(current_nodes)
 
-    raw_mesh = {'nodes': np.vstack(all_nodes),
-                mesh_class.polygon_name: np.vstack(all_polygons)}
+    raw_mesh = {
+        "nodes": np.vstack(all_nodes),
+        mesh_class.polygon_name: np.vstack(all_polygons),
+    }
 
     return mesh_class(raw_mesh)
