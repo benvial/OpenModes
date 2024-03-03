@@ -341,20 +341,20 @@ def read_mesh_meshio(filename):
     mesh = meshio.read(filename, file_format='gmsh')
 
     # check whether multiple physical objects are defined
-    if 'gmsh:physical' in mesh.cell_data['triangle']:
-        triangle_physical = mesh.cell_data['triangle']['gmsh:physical']
+    if 'gmsh:physical' in mesh.cell_data:
+        triangle_physical = mesh.cell_data_dict['gmsh:physical']['triangle']
         if not np.all(triangle_physical == triangle_physical[0]):
             raise NotImplementedError('Multiple physical objects in one mesh not yet implemented')
 
     # eliminate points which are not part of the object
-    mesh.prune()
+    # mesh.prune() 
 
-    return [{'nodes': mesh.points, 'triangles': mesh.cells['triangle']}]
+    return [{'nodes': mesh.points, 'triangles': mesh.cells_dict['triangle']}]
 
 
 def check_installed():
     "Check if a supported version of gmsh is installed"
-    call_options = [gmsh_path, '-info']
+    call_options = [gmsh_path, '--version']
 
     try:
         # Workaround for different versions of gmsh, 3.x writes to stderr,
@@ -363,7 +363,7 @@ def check_installed():
             proc = subprocess.run(call_options, stdout=out, stderr=out,
                                     universal_newlines=True, encoding='utf-8')
             out.seek(0)
-            version_string = out.readline().decode('utf-8').split(":")[1].strip()
+            version_string = out.readline().decode('utf-8').strip()
 
     except OSError:
         raise MeshError("gmsh not found")

@@ -14,10 +14,17 @@ Rob Speer's changes are as follows:
     - added a __getstate__ and __setstate__ so it can be pickled
     - added __getitem__
 """
+
 import collections
+import sys
+
+if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+    from collections.abc import MutableSet
+else:
+    from collections import MutableSet
 
 SLICE_ALL = slice(None)
-__version__ = '1.3'
+__version__ = "1.3"
 
 
 def is_iterable(obj):
@@ -32,14 +39,15 @@ def is_iterable(obj):
     We don't need to check for the Python 2 `unicode` type, because it doesn't
     have an `__iter__` attribute anyway.
     """
-    return hasattr(obj, '__iter__') and not isinstance(obj, str)
+    return hasattr(obj, "__iter__") and not isinstance(obj, str)
 
 
-class OrderedSet(collections.MutableSet):
+class OrderedSet(MutableSet):
     """
     An OrderedSet is a custom MutableSet that remembers its order, so that
     every entry has an index that can be looked up.
     """
+
     def __init__(self, iterable=None):
         self.items = []
         self.map = {}
@@ -63,7 +71,7 @@ class OrderedSet(collections.MutableSet):
         """
         if index == SLICE_ALL:
             return self
-        elif hasattr(index, '__index__') or isinstance(index, slice):
+        elif hasattr(index, "__index__") or isinstance(index, slice):
             result = self.items[index]
             if isinstance(result, list):
                 return OrderedSet(result)
@@ -72,8 +80,7 @@ class OrderedSet(collections.MutableSet):
         elif is_iterable(index):
             return OrderedSet([self.items[i] for i in index])
         else:
-            raise TypeError("Don't know how to index an OrderedSet by %r" %
-                    index)
+            raise TypeError("Don't know how to index an OrderedSet by %r" % index)
 
     def copy(self):
         return OrderedSet(self)
@@ -89,7 +96,7 @@ class OrderedSet(collections.MutableSet):
             return (None,)
         else:
             return list(self)
-    
+
     def __setstate__(self, state):
         if state == (None,):
             self.__init__([])
@@ -110,8 +117,9 @@ class OrderedSet(collections.MutableSet):
             self.map[key] = len(self.items)
             self.items.append(key)
         return self.map[key]
+
     append = add
-    
+
     def index(self, key):
         """
         Get the index of a given entry, raising an IndexError if it's not
@@ -125,9 +133,7 @@ class OrderedSet(collections.MutableSet):
         return self.map[key]
 
     def discard(self, key):
-        raise NotImplementedError(
-            "Cannot remove items from an existing OrderedSet"
-        )
+        raise NotImplementedError("Cannot remove items from an existing OrderedSet")
 
     def __iter__(self):
         return iter(self.items)
@@ -137,8 +143,8 @@ class OrderedSet(collections.MutableSet):
 
     def __repr__(self):
         if not self:
-            return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, list(self))
+            return "%s()" % (self.__class__.__name__,)
+        return "%s(%r)" % (self.__class__.__name__, list(self))
 
     def __eq__(self, other):
         if isinstance(other, OrderedSet):
@@ -150,4 +156,3 @@ class OrderedSet(collections.MutableSet):
             return False
         else:
             return set(self) == other_as_set
-

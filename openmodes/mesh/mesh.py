@@ -164,7 +164,7 @@ class TriangularSurfaceMesh(Identified):
                     all_edges.add(edge)
                     triangles_shared_by_edges[edge] = [count]
 
-        edges_array = np.empty((len(all_edges), 2), np.int)
+        edges_array = np.empty((len(all_edges), 2), int)
         sharing_list = []
         for edge_count, edge in enumerate(all_edges):
             edges_array[edge_count] = tuple(edge)

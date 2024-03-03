@@ -142,7 +142,7 @@ except(IOError, ImportError):
 exec(open(osp.join("openmodes", "version.py")).read())
 
 setup(name='OpenModes',
-      description="An eigenmode solver for open electromagnetic resonantors",
+      description="An eigenmode solver for open electromagnetic resonators",
       author="David Powell",
       author_email='DavidAnthonyPowell@gmail.com',
       license='GPLv3+',
