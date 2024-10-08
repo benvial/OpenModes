@@ -22,9 +22,9 @@ from __future__ import division
 
 import numpy as np
 
-from openmodes.array import LookupArray
-from openmodes.basis import BasisContainer, MacroBasis
-from openmodes.helpers import cached_property
+from .array import LookupArray
+from .basis import BasisContainer, MacroBasis
+from .helpers import cached_property
 
 
 def is_real_pole(s):

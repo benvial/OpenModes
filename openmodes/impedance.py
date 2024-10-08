@@ -24,7 +24,7 @@ from __future__ import division
 import numpy as np
 import scipy.linalg as la
 
-from openmodes.array import LookupArray
+from .array import LookupArray
 
 
 class ImpedanceMatrixLA(object):

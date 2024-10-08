@@ -22,16 +22,16 @@ import logging
 
 import numpy as np
 
-from openmodes.array import LookupArray
-from openmodes.basis import LinearTriangleBasis
-from openmodes.constants import epsilon_0, mu_0
-from openmodes.impedance import (
+from ..array import LookupArray
+from ..basis import LinearTriangleBasis
+from ..constants import epsilon_0, mu_0
+from ..impedance import (
     CfieImpedanceMatrixLA,
     EfieImpedanceMatrixLA,
     ImpedanceMatrixLA,
 )
-from openmodes.operator import rwg
-from openmodes.operator.operator import Operator
+from . import rwg
+from .operator import Operator
 
 
 class EfieOperator(Operator):

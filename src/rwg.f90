@@ -1232,7 +1232,7 @@ subroutine Z_MFIE_faces_self(num_nodes, num_triangles, num_integration, num_sing
     real(WP), intent(in), dimension(0:num_singular-1, 0:degree_singular-1, 3, 3) :: Z_precalc
     integer, intent(in), dimension(0:num_singular-1) :: indices_precalc
     integer, intent(in), dimension(0:num_triangles) :: indptr_precalc
-    ! f2py optional :: extract_singular = degree_singular
+    !f2py optional :: extract_singular = degree_singular
     integer, intent(in) :: extract_singular
 
     complex(WP), intent(out), dimension(0:num_triangles-1, 0:2, 0:num_triangles-1, 0:2) :: Z_face, Z_face_dgamma

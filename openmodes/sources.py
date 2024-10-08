@@ -22,8 +22,8 @@
 import numpy as np
 from numpy import cos, sin
 
-from openmodes.constants import c
-from openmodes.material import FreeSpace
+from .constants import c
+from .material import FreeSpace
 
 
 class PlaneWaveSource(object):

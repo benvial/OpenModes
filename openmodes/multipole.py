@@ -22,7 +22,7 @@ import numpy as np
 import scipy.special
 from scipy.special import factorial
 
-from openmodes.constants import eta_0
+from .constants import eta_0
 
 
 def multipole_fixed(max_l, points):

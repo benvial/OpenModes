@@ -22,11 +22,11 @@ from __future__ import division
 
 import numpy as np
 
-from openmodes.basis import LinearTriangleBasis
-from openmodes.constants import c, epsilon_0, eta_0, mu_0
-from openmodes.impedance import PenetrableImpedanceMatrixLA
-from openmodes.operator import rwg
-from openmodes.operator.operator import Operator
+from ..basis import LinearTriangleBasis
+from ..constants import c, epsilon_0, eta_0, mu_0
+from ..impedance import PenetrableImpedanceMatrixLA
+from . import rwg
+from .operator import Operator
 
 
 class TOperator(Operator):

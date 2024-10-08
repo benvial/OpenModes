@@ -23,8 +23,8 @@ from __future__ import division
 
 import numpy as np
 
-from openmodes.constants import eta_0
-from openmodes.helpers import Identified, wrap_if_constant
+from .constants import eta_0
+from .helpers import Identified, wrap_if_constant
 
 
 class IsotropicMaterial(Identified):

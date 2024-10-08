@@ -31,18 +31,18 @@ import tempfile
 # numpy and scipy
 import numpy as np
 
-from openmodes.array import LookupArray
-from openmodes.basis import BasisContainer, LoopStarBasis
-from openmodes.constants import c
-from openmodes.helpers import Identified
-from openmodes.integration import DunavantRule
-from openmodes.material import FreeSpace, PecMaterial
-from openmodes.mesh import TriangularSurfaceMesh, gmsh
-from openmodes.modes import Modes
-from openmodes.multipole import multipole_fixed, spherical_multipoles
-from openmodes.operator import EfieOperator
-from openmodes.parts import CompositePart, MultiPart, SinglePart
-from openmodes.visualise import plot_mayavi, preprocess, write_vtk
+from .array import LookupArray
+from .basis import BasisContainer, LoopStarBasis
+from .constants import c
+from .helpers import Identified
+from .integration import DunavantRule
+from .material import FreeSpace, PecMaterial
+from .mesh import TriangularSurfaceMesh, gmsh
+from .modes import Modes
+from .multipole import multipole_fixed, spherical_multipoles
+from .operator import EfieOperator
+from .parts import CompositePart, MultiPart, SinglePart
+from .visualise import plot_mayavi, preprocess, write_vtk
 
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:
     from collections.abc import Iterable
@@ -114,7 +114,7 @@ class Simulation(Identified):
         self.multipole_cache = {}
         self.notebook = notebook
         if notebook:
-            from openmodes.ipython import init_3d
+            from .ipython import init_3d
 
             init_3d()
 
@@ -467,7 +467,7 @@ class Simulation(Identified):
             )
 
         elif output_format == "webgl":
-            from openmodes.ipython import plot_3d
+            from .ipython import plot_3d
 
             return plot_3d(parts_list, charges, currents, centres, **kwargs)
         else:

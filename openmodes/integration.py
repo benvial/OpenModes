@@ -24,9 +24,9 @@ import numpy as np
 import numpy.linalg as la
 import scipy.special
 
-from openmodes.external.point_in_polygon import wn_PnPoly
-from openmodes.helpers import Identified
-
+from .external.point_in_polygon import wn_PnPoly
+from .helpers import Identified
+from . import dunavant
 
 class IntegrationRule(Identified):
     def __len__(self):
@@ -61,7 +61,6 @@ class DunavantRule(IntegrationRule):
         """
         super(DunavantRule, self).__init__()
 
-        from openmodes import dunavant
 
         self.order = order
         num_points = dunavant.dunavant_order_num(order)

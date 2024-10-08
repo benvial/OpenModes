@@ -37,8 +37,8 @@ import numpy as np
 from IPython.display import HTML, display
 from pkg_resources import resource_filename
 
-from openmodes import template_env
-from openmodes.mesh import combine_mesh
+from . import template_env
+from .mesh import combine_mesh
 
 three_js_dir = resource_filename("openmodes", osp.join("external", "three.js"))
 static_dir = resource_filename("openmodes", "static")

@@ -21,14 +21,14 @@ fully specific to RWG and related basis functions"""
 
 import numpy as np
 
-from openmodes.constants import c, pi
-from openmodes.core import (
+from ..constants import c, pi
+from ..core import (
     z_efie_faces_mutual,
     z_efie_faces_self,
     z_mfie_faces_mutual,
     z_mfie_faces_self,
 )
-from openmodes.operator.singularities import singular_impedance_rwg
+from .singularities import singular_impedance_rwg
 
 
 def impedance_curl_G(
@@ -65,7 +65,6 @@ def impedance_curl_G(
             rel_tol=singularity_accuracy,
             normals=normals,
         )
-
         if tangential_form:
             singular_terms = singular_terms["T_MFIE"]
         else:

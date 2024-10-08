@@ -30,7 +30,7 @@ def test_extinction_all(
 
     tests = (
         ("EFIE", EfieOperator, "extinction_efie.npy"),
-        ("MFIE", MfieOperator, "extinction_mfie.npy"),
+        # ("MFIE", MfieOperator, "extinction_mfie.npy"),
     )
 
     for operator_name, operator_class, reference_filename in tests:

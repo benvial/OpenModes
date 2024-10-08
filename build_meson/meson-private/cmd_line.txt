@@ -1,0 +1,8 @@
+[options]
+buildtype = release
+b_ndebug = if-release
+b_vscrt = md
+
+[properties]
+native_file = ['/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/meson-python-native-file.ini']
+

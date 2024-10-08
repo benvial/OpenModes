@@ -25,9 +25,9 @@ import logging
 
 import numpy as np
 
-from openmodes.basis import LinearTriangleBasis
-from openmodes.core import face_integrals_yla_oijala
-
+from ..basis import LinearTriangleBasis
+from ..core import face_integrals_yla_oijala
+from ..integration import DunavantRule
 
 class MultiSparse(object):
     """A sparse matrix class for holding multiple arrays with the same
@@ -127,8 +127,6 @@ class MultiSparse(object):
 cached_singular_terms = {}
 
 
-from openmodes.integration import DunavantRule
-
 rule = DunavantRule(20)
 
 
@@ -150,7 +148,7 @@ def singular_impedance_rwg(basis, num_terms, rel_tol, normals):
     Returns
     -------
     singular_terms : dictionary of SingularSparse object
-        Each key "T_EFIE", "T_MFIE" and "N_MFIE" has a value withthe sparse
+        Each key "T_EFIE", "T_MFIE" and "N_MFIE" has a value with the sparse
         array of singular impedance terms for that operator
     """
 

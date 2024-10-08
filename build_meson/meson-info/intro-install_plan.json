@@ -1,0 +1,291 @@
+{
+  "targets": {
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core.cpython-311-x86_64-linux-gnu.so": {
+      "destination": "{py_platlib}/openmodes/core.cpython-311-x86_64-linux-gnu.so",
+      "tag": "runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant.cpython-311-x86_64-linux-gnu.so": {
+      "destination": "{py_platlib}/openmodes/dunavant.cpython-311-x86_64-linux-gnu.so",
+      "tag": "runtime",
+      "subproject": null
+    }
+  },
+  "python": {
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/integration.py": {
+      "destination": "{py_platlib}/openmodes/integration.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/__init__.py": {
+      "destination": "{py_platlib}/openmodes/__init__.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/sources.py": {
+      "destination": "{py_platlib}/openmodes/sources.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/ipython.py": {
+      "destination": "{py_platlib}/openmodes/ipython.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/model.py": {
+      "destination": "{py_platlib}/openmodes/model.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/impedance.py": {
+      "destination": "{py_platlib}/openmodes/impedance.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/helpers.py": {
+      "destination": "{py_platlib}/openmodes/helpers.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/material.py": {
+      "destination": "{py_platlib}/openmodes/material.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/array.py": {
+      "destination": "{py_platlib}/openmodes/array.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/modes.py": {
+      "destination": "{py_platlib}/openmodes/modes.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/simulation.py": {
+      "destination": "{py_platlib}/openmodes/simulation.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/parts.py": {
+      "destination": "{py_platlib}/openmodes/parts.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/visualise.py": {
+      "destination": "{py_platlib}/openmodes/visualise.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/eig.py": {
+      "destination": "{py_platlib}/openmodes/eig.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/constants.py": {
+      "destination": "{py_platlib}/openmodes/constants.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/basis.py": {
+      "destination": "{py_platlib}/openmodes/basis.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/version.py": {
+      "destination": "{py_platlib}/openmodes/version.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/multipole.py": {
+      "destination": "{py_platlib}/openmodes/multipole.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/__init__.py": {
+      "destination": "{py_platlib}/openmodes/operator/__init__.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/operator.py": {
+      "destination": "{py_platlib}/openmodes/operator/operator.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/rwg.py": {
+      "destination": "{py_platlib}/openmodes/operator/rwg.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/penetrable.py": {
+      "destination": "{py_platlib}/openmodes/operator/penetrable.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/singularities.py": {
+      "destination": "{py_platlib}/openmodes/operator/singularities.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/operator/pec.py": {
+      "destination": "{py_platlib}/openmodes/operator/pec.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/external/__init__.py": {
+      "destination": "{py_platlib}/openmodes/external/__init__.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/external/ordered_set.py": {
+      "destination": "{py_platlib}/openmodes/external/ordered_set.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/external/point_in_polygon.py": {
+      "destination": "{py_platlib}/openmodes/external/point_in_polygon.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/templates/three_js_plot.html": {
+      "destination": "{py_platlib}/openmodes/templates/three_js_plot.html",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/static/three_js_plot.js": {
+      "destination": "{py_platlib}/openmodes/static/three_js_plot.js",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/mesh/__init__.py": {
+      "destination": "{py_platlib}/openmodes/mesh/__init__.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/mesh/mesh.py": {
+      "destination": "{py_platlib}/openmodes/mesh/mesh.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/mesh/freecad.py": {
+      "destination": "{py_platlib}/openmodes/mesh/freecad.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/mesh/gmsh.py": {
+      "destination": "{py_platlib}/openmodes/mesh/gmsh.py",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/cross.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/cross.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/canonical_spiral.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/canonical_spiral.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/SRR.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/SRR.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/cylinder_hole.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/cylinder_hole.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/sphere.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/sphere.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/single.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/single.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/single-bent.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/single-bent.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/circle.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/circle.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/solid_L.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/solid_L.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/rectangle.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/rectangle.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/horseshoe_rect.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/horseshoe_rect.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/closed_ring.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/closed_ring.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/isosceles.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/isosceles.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/torus.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/torus.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/box.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/box.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/cylinder_rounded.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/cylinder_rounded.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/ellipsoid.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/ellipsoid.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/asymmetric_ring.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/asymmetric_ring.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/cylinder_hollow.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/cylinder_hollow.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/v_antenna.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/v_antenna.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/circled_cross.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/circled_cross.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    },
+    "/home/bench/dev/oslumen/contrib/mom/OpenModes/openmodes/geometry/elliptical_cylinder.geo": {
+      "destination": "{py_platlib}/openmodes/geometry/elliptical_cylinder.geo",
+      "tag": "python-runtime",
+      "subproject": null
+    }
+  }
+}

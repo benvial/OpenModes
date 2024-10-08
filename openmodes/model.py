@@ -22,8 +22,8 @@ from __future__ import division
 
 import numpy as np
 
-from openmodes.impedance import EfieImpedanceMatrixLA, ImpedanceMatrixLA
-from openmodes.modes import SplitModes
+from .impedance import EfieImpedanceMatrixLA, ImpedanceMatrixLA
+from .modes import SplitModes
 
 
 class ModelMutualWeight(object):

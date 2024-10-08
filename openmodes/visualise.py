@@ -21,7 +21,7 @@ Routines for displaying parts and solutions.
 """
 import numpy as np
 
-from openmodes.mesh import combine_mesh
+from .mesh import combine_mesh
 
 
 def compress(func, factor, max_val=None):

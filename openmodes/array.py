@@ -258,7 +258,7 @@ class LookupArray(np.ndarray):
                         # If slicing the whole dimension, metadata can be kept
                         sub_lookup.append(self.lookup[entry_num])
                     elif isinstance(entry, Iterable):
-                        # TODO: find a better solution to avoid this probelm
+                        # TODO: find a better solution to avoid this problem
                         warnings.warn(
                             "Indexing LookupArray with iterable is unreliable"
                         )

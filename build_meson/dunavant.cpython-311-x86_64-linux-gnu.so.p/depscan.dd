@@ -1,0 +1,3 @@
+ninja_dyndep_version = 1
+build dunavant.cpython-311-x86_64-linux-gnu.so.p/meson-generated_.._dunavant-f2pywrappers.f.o : dyndep 
+build dunavant.cpython-311-x86_64-linux-gnu.so.p/src_dunavant.f90.o : dyndep 

@@ -1,0 +1,84 @@
+{
+  "host": {
+    "fortran": {
+      "id": "gcc",
+      "exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+      ],
+      "linker_exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+      ],
+      "file_suffixes": [
+        "f90",
+        "f95",
+        "f03",
+        "f08",
+        "f",
+        "for",
+        "ftn",
+        "fpp"
+      ],
+      "default_suffix": "f90",
+      "version": "12.4.0",
+      "full_version": "GNU Fortran (conda-forge gcc 12.4.0-1) 12.4.0",
+      "linker_id": "ld.bfd"
+    },
+    "c": {
+      "id": "gcc",
+      "exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+      ],
+      "linker_exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+      ],
+      "file_suffixes": [
+        "c"
+      ],
+      "default_suffix": "c",
+      "version": "12.4.0",
+      "full_version": "x86_64-conda-linux-gnu-cc (conda-forge gcc 12.4.0-1) 12.4.0",
+      "linker_id": "ld.bfd"
+    }
+  },
+  "build": {
+    "fortran": {
+      "id": "gcc",
+      "exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+      ],
+      "linker_exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+      ],
+      "file_suffixes": [
+        "f90",
+        "f95",
+        "f03",
+        "f08",
+        "f",
+        "for",
+        "ftn",
+        "fpp"
+      ],
+      "default_suffix": "f90",
+      "version": "12.4.0",
+      "full_version": "GNU Fortran (conda-forge gcc 12.4.0-1) 12.4.0",
+      "linker_id": "ld.bfd"
+    },
+    "c": {
+      "id": "gcc",
+      "exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+      ],
+      "linker_exelist": [
+        "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+      ],
+      "file_suffixes": [
+        "c"
+      ],
+      "default_suffix": "c",
+      "version": "12.4.0",
+      "full_version": "x86_64-conda-linux-gnu-cc (conda-forge gcc 12.4.0-1) 12.4.0",
+      "linker_id": "ld.bfd"
+    }
+  }
+}

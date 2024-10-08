@@ -37,7 +37,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from openmodes.helpers import MeshError
+from ..helpers import MeshError
 
 # the minimum version of gmsh required
 MIN_VERSION = (3, 0, 0)

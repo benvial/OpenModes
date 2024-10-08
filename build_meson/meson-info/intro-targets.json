@@ -1,0 +1,449 @@
+[
+  {
+    "name": "coremodule.c",
+    "id": "coremodule.c@cus",
+    "type": "custom",
+    "defined_in": "/home/bench/dev/oslumen/contrib/mom/OpenModes/meson.build",
+    "filename": [
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/coremodule.c",
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core-f2pywrappers.f"
+    ],
+    "build_by_default": false,
+    "target_sources": [
+      {
+        "language": "unknown",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/python3.11",
+          "-m",
+          "numpy.f2py",
+          "@INPUT0@",
+          "@INPUT1@",
+          "-m",
+          "core",
+          "--lower",
+          "--f2cmap",
+          "@INPUT2@",
+          "--overwrite-signature",
+          "only: set_threads get_threads face_integrals_hanninen z_efie_faces_self z_efie_faces_mutual arcioni_singular z_mfie_faces_self z_mfie_faces_mutual face_integrals_yla_oijala :"
+        ],
+        "parameters": [],
+        "sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/common.f90",
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/rwg.f90",
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/.f2py_f2cmap"
+        ],
+        "generated_sources": []
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [],
+    "depends": [],
+    "installed": false
+  },
+  {
+    "name": "core.cpython-311-x86_64-linux-gnu",
+    "id": "core.cpython-311-x86_64-linux-gnu.so@sha",
+    "type": "shared module",
+    "defined_in": "/home/bench/dev/oslumen/contrib/mom/OpenModes/meson.build",
+    "filename": [
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core.cpython-311-x86_64-linux-gnu.so"
+    ],
+    "build_by_default": true,
+    "target_sources": [
+      {
+        "language": "c",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+        ],
+        "parameters": [
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core.cpython-311-x86_64-linux-gnu.so.p",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/_core/include",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/include/python3.11",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/include",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib/stubs",
+          "-fvisibility=hidden",
+          "-fdiagnostics-color=always",
+          "-D_FILE_OFFSET_BITS=64",
+          "-Wall",
+          "-Winvalid-pch",
+          "-Wextra",
+          "-O3",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-DNDEBUG",
+          "-D_FORTIFY_SOURCE=2",
+          "-O2",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fPIC",
+          "-fopenmp",
+          "-fopenmp"
+        ],
+        "sources": [
+          "/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src/fortranobject.c"
+        ],
+        "generated_sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/coremodule.c"
+        ],
+        "unity_sources": []
+      },
+      {
+        "language": "fortran",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+        ],
+        "parameters": [
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core.cpython-311-x86_64-linux-gnu.so.p",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/_core/include",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/include/python3.11",
+          "-fvisibility=hidden",
+          "-fdiagnostics-color=always",
+          "-DNDEBUG",
+          "-D_FILE_OFFSET_BITS=64",
+          "-Wall",
+          "-Wextra",
+          "-O3",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fPIC",
+          "-fopenmp",
+          "-g",
+          "-O3",
+          "-fimplicit-none",
+          "-fopenmp"
+        ],
+        "sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/common.f90",
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/rwg.f90"
+        ],
+        "generated_sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/core-f2pywrappers.f"
+        ],
+        "unity_sources": []
+      },
+      {
+        "linker": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+        ],
+        "parameters": [
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib/gcc/x86_64-conda-linux-gnu/12.4.0",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib/gcc",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../x86_64-conda-linux-gnu/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/sysroot/lib64",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/sysroot/usr/lib64",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../x86_64-conda-linux-gnu/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../..",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib/stubs",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/include",
+          "-Wl,--as-needed",
+          "-Wl,--allow-shlib-undefined",
+          "-Wl,-O1",
+          "-shared",
+          "-fPIC",
+          "-Wl,-O2",
+          "-Wl,--sort-common",
+          "-Wl,--as-needed",
+          "-Wl,-z,relro",
+          "-Wl,-z,now",
+          "-Wl,--disable-new-dtags",
+          "-Wl,--gc-sections",
+          "-Wl,--allow-shlib-undefined",
+          "-Wl,-rpath,/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-Wl,-rpath-link,/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-DNDEBUG",
+          "-D_FORTIFY_SOURCE=2",
+          "-O2",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fopenmp",
+          "-Wl,--start-group",
+          "-Wl,--start-group",
+          "-lgfortran",
+          "-lm",
+          "-Wl,--end-group",
+          "-Wl,--end-group"
+        ]
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [
+      "python-3.11",
+      "openmp"
+    ],
+    "depends": [],
+    "installed": true,
+    "install_filename": [
+      "/usr/local/lib/python3.11/site-packages/openmodes/core.cpython-311-x86_64-linux-gnu.so"
+    ]
+  },
+  {
+    "name": "dunavantmodule.c",
+    "id": "dunavantmodule.c@cus",
+    "type": "custom",
+    "defined_in": "/home/bench/dev/oslumen/contrib/mom/OpenModes/meson.build",
+    "filename": [
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavantmodule.c",
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant-f2pywrappers.f"
+    ],
+    "build_by_default": false,
+    "target_sources": [
+      {
+        "language": "unknown",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/python3.11",
+          "-m",
+          "numpy.f2py",
+          "@INPUT0@",
+          "-m",
+          "dunavant",
+          "--lower",
+          "--f2cmap",
+          "@INPUT1@",
+          "--overwrite-signature",
+          "only: dunavant_order_num dunavant_rule :"
+        ],
+        "parameters": [],
+        "sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/dunavant.f90",
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/.f2py_f2cmap"
+        ],
+        "generated_sources": []
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [],
+    "depends": [],
+    "installed": false
+  },
+  {
+    "name": "dunavant.cpython-311-x86_64-linux-gnu",
+    "id": "dunavant.cpython-311-x86_64-linux-gnu.so@sha",
+    "type": "shared module",
+    "defined_in": "/home/bench/dev/oslumen/contrib/mom/OpenModes/meson.build",
+    "filename": [
+      "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant.cpython-311-x86_64-linux-gnu.so"
+    ],
+    "build_by_default": true,
+    "target_sources": [
+      {
+        "language": "c",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+        ],
+        "parameters": [
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant.cpython-311-x86_64-linux-gnu.so.p",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/_core/include",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/include/python3.11",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/include",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib/stubs",
+          "-fvisibility=hidden",
+          "-fdiagnostics-color=always",
+          "-D_FILE_OFFSET_BITS=64",
+          "-Wall",
+          "-Winvalid-pch",
+          "-Wextra",
+          "-O3",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-DNDEBUG",
+          "-D_FORTIFY_SOURCE=2",
+          "-O2",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fPIC",
+          "-fopenmp",
+          "-fopenmp"
+        ],
+        "sources": [
+          "/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src/fortranobject.c"
+        ],
+        "generated_sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavantmodule.c"
+        ],
+        "unity_sources": []
+      },
+      {
+        "language": "fortran",
+        "compiler": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-gfortran"
+        ],
+        "parameters": [
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant.cpython-311-x86_64-linux-gnu.so.p",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson",
+          "-I/home/bench/dev/oslumen/contrib/mom/OpenModes",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/_core/include",
+          "-I/tmp/pip-build-env-rl1t7zun/overlay/lib/python3.11/site-packages/numpy/f2py/src",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/include/python3.11",
+          "-fvisibility=hidden",
+          "-fdiagnostics-color=always",
+          "-DNDEBUG",
+          "-D_FILE_OFFSET_BITS=64",
+          "-Wall",
+          "-Wextra",
+          "-O3",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fPIC",
+          "-fopenmp",
+          "-g",
+          "-O3",
+          "-fimplicit-none",
+          "-fopenmp"
+        ],
+        "sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/src/dunavant.f90"
+        ],
+        "generated_sources": [
+          "/home/bench/dev/oslumen/contrib/mom/OpenModes/build_meson/dunavant-f2pywrappers.f"
+        ],
+        "unity_sources": []
+      },
+      {
+        "linker": [
+          "/home/bench/prg/mambaforge/envs/oslumen/bin/x86_64-conda-linux-gnu-cc"
+        ],
+        "parameters": [
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib/gcc/x86_64-conda-linux-gnu/12.4.0",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib/gcc",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../x86_64-conda-linux-gnu/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/sysroot/lib64",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/x86_64-conda-linux-gnu/sysroot/usr/lib64",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib/../lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../../../x86_64-conda-linux-gnu/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../lib/gcc/x86_64-conda-linux-gnu/12.4.0/../../..",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib",
+          "-L/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/lib/stubs",
+          "-I/home/bench/prg/mambaforge/envs/oslumen/targets/x86_64-linux/include",
+          "-Wl,--as-needed",
+          "-Wl,--allow-shlib-undefined",
+          "-Wl,-O1",
+          "-shared",
+          "-fPIC",
+          "-Wl,-O2",
+          "-Wl,--sort-common",
+          "-Wl,--as-needed",
+          "-Wl,-z,relro",
+          "-Wl,-z,now",
+          "-Wl,--disable-new-dtags",
+          "-Wl,--gc-sections",
+          "-Wl,--allow-shlib-undefined",
+          "-Wl,-rpath,/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-Wl,-rpath-link,/home/bench/prg/mambaforge/envs/oslumen/lib",
+          "-march=nocona",
+          "-mtune=haswell",
+          "-ftree-vectorize",
+          "-fPIC",
+          "-fstack-protector-strong",
+          "-fno-plt",
+          "-O2",
+          "-ffunction-sections",
+          "-pipe",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-DNDEBUG",
+          "-D_FORTIFY_SOURCE=2",
+          "-O2",
+          "-isystem",
+          "/home/bench/prg/mambaforge/envs/oslumen/include",
+          "-fopenmp",
+          "-Wl,--start-group",
+          "-Wl,--start-group",
+          "-lgfortran",
+          "-lm",
+          "-Wl,--end-group",
+          "-Wl,--end-group"
+        ]
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [
+      "python-3.11",
+      "openmp"
+    ],
+    "depends": [],
+    "installed": true,
+    "install_filename": [
+      "/usr/local/lib/python3.11/site-packages/openmodes/dunavant.cpython-311-x86_64-linux-gnu.so"
+    ]
+  }
+]

@@ -21,8 +21,8 @@ import uuid
 
 import numpy as np
 
-from openmodes.helpers import Identified, PicklableRef
-from openmodes.material import PecMaterial
+from .helpers import Identified, PicklableRef
+from .material import PecMaterial
 
 
 class Part(Identified):

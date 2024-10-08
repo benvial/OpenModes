@@ -26,8 +26,8 @@ from collections import namedtuple
 import numpy as np
 from scipy.sparse import lil_matrix
 
-from openmodes.external.ordered_set import OrderedSet
-from openmodes.helpers import (
+from .external.ordered_set import OrderedSet
+from .helpers import (
     Identified,
     MeshError,
     cached_property,
@@ -35,9 +35,9 @@ from openmodes.helpers import (
     inc_slice,
     memoize,
 )
-from openmodes.integration import triangle_centres
-from openmodes.mesh import nodes_not_in_edge, shared_nodes
-from openmodes.parts import Part
+from .integration import triangle_centres
+from .mesh import nodes_not_in_edge, shared_nodes
+from .parts import Part
 
 # A named tuple for holding the positive and negative triangles and nodes
 # which are used by both RWG and loop-star basis functions
