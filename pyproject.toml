@@ -37,6 +37,7 @@ dependencies = [
     "meshio",
     "dill",
     "pyvista",
+    "gmsh",
 ]
 
 [tool.setuptools]
@@ -55,6 +56,9 @@ test = [
 ]
 doc = [
   "sphinx",
+  "sphinxawesome-theme",
+  "sphinx-gallery",
+  "memory_profiler",
 ]
 all = ["openmodes[plot,test,doc]"]
 

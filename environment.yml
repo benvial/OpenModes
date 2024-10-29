@@ -6,6 +6,7 @@ dependencies:
   - pip
   - numpy
   - compilers
+  - gmsh
   - numpy >= 1.22
   - scipy >= 0.18.0
   - matplotlib
