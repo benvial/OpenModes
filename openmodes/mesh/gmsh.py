@@ -24,7 +24,6 @@ a format which OpenModes recognises.
 Gmsh 2.8.4 is required, as it introduced the `setnumber` command line parameter
 """
 
-from __future__ import print_function
 
 import logging
 import os
@@ -396,11 +395,3 @@ def check_installed():
 
     except OSError:
         raise MeshError("gmsh not found")
-
-    ver = tuple([int(x) for x in version_string.split(".")])
-
-    if ver < MIN_VERSION:
-        raise MeshError(
-            ("gmsh version %d.%d.%d found, " + "but version %d.%d.%d required")
-            % (ver + MIN_VERSION)
-        )
