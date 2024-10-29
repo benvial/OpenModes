@@ -1,6 +1,6 @@
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', 'meson >= 0.64.0', "numpy >=1.20"]
+requires = ['meson-python', "numpy >=1.22"]
 
 [project]
 name = 'openmodes'
@@ -28,14 +28,15 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "numpy >= 1.20",
+    "numpy >= 1.22",
     "scipy >= 0.18.0",
     "matplotlib",
     "jinja2",
     "six",
     "ipywidgets",
-    "meshio<=5.0.0",
+    "meshio",
     "dill",
+    "pyvista",
 ]
 
 [tool.setuptools]
@@ -43,6 +44,7 @@ packages = ["openmodes"]
 
 
 [project.optional-dependencies]
+plot = ["mayavi"]
 test = [
   "pytest",
   "pytest-cov",
@@ -54,7 +56,7 @@ test = [
 doc = [
   "sphinx",
 ]
-all = ["openmodes[test,doc]"]
+all = ["openmodes[plot,test,doc]"]
 
 
 [tool.pytest.ini_options]

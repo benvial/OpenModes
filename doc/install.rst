@@ -41,6 +41,8 @@ OpenModes and all its dependencies in one package.
    <http://jupyter-notebook.readthedocs.io/en/latest/security.html>`_.
 
 
+.. _upgrading-to-a-newer-version:
+
 Upgrading to a Newer Version
 ----------------------------
 

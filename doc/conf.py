@@ -17,15 +17,29 @@ import shutil
 import subprocess
 import sys
 from os.path import join, splitext
+import pyvista
+from mayavi import mlab
+import openmodes as package
 
-# finished generated, so go back up a level
-os.chdir("..")
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath(join('..', 'openmodes')))
-sys.path.insert(0, os.path.abspath(".."))
+mlab.options.offscreen = True
+
+
+# necessary when building the sphinx gallery
+pyvista.BUILDING_GALLERY = True
+pyvista.OFF_SCREEN = True
+
+# Optional - set parameters like theme or window size
+pyvista.set_plot_theme("document")
+
+# # finished generated, so go back up a level
+# os.chdir("..")
+
+# # If extensions (or modules to document with autodoc) are in another directory,
+# # add these directories to sys.path here. If the directory is relative to the
+# # documentation root, use os.path.abspath to make it absolute, like shown here.
+# # sys.path.insert(0, os.path.abspath(join('..', 'openmodes')))
+# sys.path.insert(0, os.path.abspath(".."))
 
 # print sys.path
 
@@ -38,7 +52,14 @@ sys.path.insert(0, os.path.abspath(".."))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.mathjax",
+	"sphinx.ext.autodoc",
+	"sphinx.ext.doctest",
+	"sphinx.ext.todo",
+	"sphinx.ext.coverage",
+	"sphinx.ext.mathjax",
+	"sphinx.ext.viewcode",
+	"sphinx.ext.napoleon",
+	"sphinx_gallery.gen_gallery",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,10 +84,8 @@ copyright = "2012-2017, David Powell"
 #
 # The short X.Y version.
 
-# run the script to find the version
-exec(open(join("openmodes", "version.py")).read())
 
-version = __version__
+version = package.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -113,7 +132,7 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "custom-agogo"
+html_theme = "sphinxawesome_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -121,44 +140,33 @@ html_theme = "custom-agogo"
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ["_themes"]
+# html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "OpenModes Documentation"
+html_title = "OpenModes"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = None
+html_logo = "_static/openmodes.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-# html_favicon = None
+html_favicon = "_static/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
-# Add any extra paths that contain custom files (such as robots.txt or
-# .htaccess) here, relative to this directory. These files are copied
-# directly to the root of the documentation.
-# html_extra_path = []
 
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-# html_last_updated_fmt = '%b %d, %Y'
-
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-# html_use_smartypants = True
-
-# Custom sidebar templates, maps document names to template names.
-html_sidebars = {"**": ["sidebar_links.html"]}
+# # Custom sidebar templates, maps document names to template names.
+# html_sidebars = {"**": ["sidebar_links.html"]}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -271,3 +279,45 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+sphinx_gallery_conf = {
+	# path to your examples scripts
+	"examples_dirs": ["../examples"],
+	# path where to save gallery generated examples
+	"gallery_dirs": ["examples"],
+	# # path to your examples scripts
+	# "examples_dirs": ["../tutorials"],
+	# # path where to save gallery generated examples
+	# "gallery_dirs": ["tutorials"],
+	# directory where function granular galleries are stored
+	"backreferences_dir": "generated/backreferences",
+	"remove_config_comments": True,
+	"reference_url": {
+		"sphinx_gallery": None,
+	},
+	"reset_modules": (),
+    "image_scrapers": ("pyvista", "matplotlib"),
+	# "pypandoc": True,
+	# "pypandoc": {"extra_args": ["-C","--bibliography=_custom/latex/biblio.bib"], "filters": []},
+	# "filename_pattern": "plot_homogenization\.py",
+	"filename_pattern": "/plot_",
+	# "ignore_pattern": r"^((?!/plot_).)*$",  # ignore files that do not start with plot_
+	# "first_notebook_cell": (
+	#     "import matplotlib\n" "mpl.style.use('gyptis')\n" "%matplotlib inline"
+	# ),
+	# "image_scrapers": ("matplotlib", PNGScraper()),
+	# Modules for which function level galleries are created.
+	"doc_module": package.__name__,
+	"thumbnail_size": (800, 800),
+	"default_thumb_file": "./_static/openmodes.png",
+	"show_memory": True,
+	# "binder": {
+	#     "org": "phokaia",
+	#     "repo": "phokaia.gitlab.io/emustack",
+	#     "branch": "doc",
+	#     "binderhub_url": "https://mybinder.org",
+	#     "dependencies": "../environment.yml",
+	#     "notebooks_dir": "notebooks",
+	#     "use_jupyter_lab": True,
+	# },
+}

@@ -8,7 +8,7 @@ Overview
 
 .. image:: _static/montage.png
    :width: 400px
-   :align: right
+   :align: center
 
 OpenModes is a code aimed at solving the modes of open electromagnetic structures.
 Using these modes, broadband models of these elements can be created, enabling
@@ -43,7 +43,7 @@ The :doc:`examples` give an overview of OpenModes' capabilities, and can be view
    gettingstarted
    whatsnew
    install
-   examples
+   examples/index
    features
    using
    maths

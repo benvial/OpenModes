@@ -368,7 +368,10 @@ def read_mesh_meshio(filename):
             )
 
     # eliminate points which are not part of the object
-    mesh.remove_orphaned_nodes()
+    # FIXME: this function has disapeared from meshio
+    # see: https://github.com/nschloe/meshio/issues/1282
+    # https://gitlab.onelab.info/gmsh/gmsh/-/issues/2393
+    # mesh.remove_orphaned_nodes()
 
     return [{"nodes": mesh.points, "triangles": mesh.cells_dict["triangle"]}]
 

@@ -27,6 +27,7 @@ import os.path as osp
 import shutil
 import sys
 import tempfile
+import pyvista as pv
 
 # numpy and scipy
 import numpy as np
@@ -43,6 +44,8 @@ from .multipole import multipole_fixed, spherical_multipoles
 from .operator import EfieOperator
 from .parts import CompositePart, MultiPart, SinglePart
 from .visualise import plot_mayavi, preprocess, write_vtk
+from .mesh import combine_mesh
+
 
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:
     from collections.abc import Iterable
@@ -262,7 +265,7 @@ class Simulation(Identified):
         previous_result=None,
         cauchy_integral=True,
         modes=None,
-        **kwargs
+        **kwargs,
     ):
         """Estimate the location of poles and their modes by Cauchy integration
         or a simpler quasi-static method
@@ -398,11 +401,11 @@ class Simulation(Identified):
         self,
         solution=None,
         part=None,
-        output_format="webgl",
+        output_format="vtk",
         filename=None,
         compress_scalars=None,
         compress_separately=False,
-        **kwargs
+        **kwargs,
     ):
         """Plot a solution on several parts
 
@@ -442,8 +445,33 @@ class Simulation(Identified):
                     part = solution.lookup[0][2]
                     basis_container = solution.lookup[0][1]
 
+        output_format = output_format.lower()
+
         if output_format == "vtk":
-            write_vtk(part, filename, solution, basis_container)
+            parts_list = part.children
+            meshes = [part.mesh for part in parts_list]
+            nodes = [part.nodes for part in parts_list]
+            full_mesh = combine_mesh(meshes, nodes)
+            mesh_size = full_mesh.fast_size()
+
+            tmpdir = tempfile.mkdtemp()
+            tempname = osp.join(tmpdir, "part.vtp")
+            write_vtk(part, tempname, solution, basis_container)
+            plotobj = pv.read(tempname)
+            p = pv.Plotter()
+            p.add_mesh(plotobj)
+            if "colormap" not in kwargs:
+                kwargs["colormap"] = "RdBu_r"
+            if solution is not None:
+                kwargs["scalars"] = "rho_e_real"
+                jre = plotobj["J_real"]
+                scale = 1 / np.linalg.norm(jre, axis=1).max() * mesh_size / 5
+                arrows = plotobj.glyph("J_real", scale="J_real", factor=scale)
+                p.add_mesh(arrows, color="black")
+            p.add_mesh(plotobj, **kwargs)
+
+            p.show()
+
             return
 
         if solution is None:
@@ -455,7 +483,6 @@ class Simulation(Identified):
                 part, solution, basis_container, compress_scalars, compress_separately
             )
 
-        output_format = output_format.lower()
         if output_format == "mayavi":
             plot_mayavi(
                 parts_list,

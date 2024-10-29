@@ -254,7 +254,7 @@ def vtk_da(doc, ar, name=None, type_name=None):
     da = doc.createElementNS("VTK", "DataArray")
 
     if len(ar.shape) > 1:
-        da.setAttribute("NumberOfComponents", str(np.product(ar.shape[1:])))
+        da.setAttribute("NumberOfComponents", str(np.prod(ar.shape[1:])))
 
     if type_name is None:
         type_name = vtk_type_map[ar.dtype]
