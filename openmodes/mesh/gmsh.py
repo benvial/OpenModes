@@ -38,8 +38,6 @@ import numpy as np
 
 from ..helpers import MeshError
 
-# the minimum version of gmsh required
-MIN_VERSION = (3, 0, 0)
 
 try:
     gmsh_path = os.environ["GMSH_PATH"]
