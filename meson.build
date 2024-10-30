@@ -18,7 +18,7 @@ c_flags = ['-fopenmp', '-Wno-cast-function-type','-Wno-unused-parameter',
 '-Wno-unused-variable','-Wno-missing-field-initializers']
 fortran_opt_flags = ['-g', '-O3', '-fimplicit-none','-Wno-unused-variable']
 # intel_fortran_flags = ['-openmp', '-O2', '/fpe:0', '/fp:fast=2']
-omp = dependency('openmp')
+omp = dependency('openmp', required: false)
 dependencies = [py_dep, omp]
 
 incdir_numpy = run_command(py,
