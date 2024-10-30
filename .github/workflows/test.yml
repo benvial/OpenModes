@@ -20,6 +20,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends  \
           libgl1 libxcursor1 libxft2 libxinerama1 libglu1-mesa
+      - name: Install system packages
         if: matrix.os == 'macos-latest'
         run: |
           brew update
